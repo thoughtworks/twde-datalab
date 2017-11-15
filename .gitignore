@@ -1,1 +1,3 @@
-downloads/
+data/*.csv
+test/__pycache__/
+*.pyc
