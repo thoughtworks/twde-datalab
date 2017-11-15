@@ -5,7 +5,7 @@ https://www.kaggle.com/c/favorita-grocery-sales-forecasting
 # notes for setup
 I recommend using anaconda to set up environment using environment.yml
 
-Yet, sometimes necessary latest version is not available then please use pip in addition. 
+Yet, sometimes necessary latest version is not available. Then please use pip in addition. 
 for example,
 pip install notebook==5.1.0
 
