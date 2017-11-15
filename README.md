@@ -2,7 +2,7 @@
 exploratory repo for kaggle competition:
 https://www.kaggle.com/c/favorita-grocery-sales-forecasting
 
-Note for setup
+# Note for setup
 I recommend using anaconda to set up environment using environment.yml
 Yet, sometimes necessary latest version is not available then please use pip in addition. 
 for example,
