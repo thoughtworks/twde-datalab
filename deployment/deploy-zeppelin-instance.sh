@@ -24,7 +24,7 @@ createCluster () {
     --ebs-root-volume-size 10 \
     --service-role EMR_DefaultRole \
     --enable-debugging \
-    --name ${cluster_name:-'Cluster deployed from CLI'} \
+    --name ${cluster_name:-'Deployed from CLI'} \
     --scale-down-behavior TERMINATE_AT_INSTANCE_HOUR \
     --region eu-west-1
 }
@@ -35,6 +35,11 @@ sshWithKeypair() {
   ssh -i ~/keypair.pem -ND 8157 hadoop@ec2-54-246-162-93.eu-west-1.compute.amazonaws.com
 }
 
+push_latest_bootstrap_actions(){
+  aws s3 cp ./emr-install.sh s3://twde-datalab/
+}
+
+
 while getopts 'n:' arg
 do
   case ${arg} in
@@ -44,5 +49,6 @@ do
 done
 echo  
 
+push_latest_bootstrap_actions
 createCluster
 sshWithKeypair
