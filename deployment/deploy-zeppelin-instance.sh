@@ -38,6 +38,9 @@ sshWithKeypair() {
 push_latest_bootstrap_actions(){
   aws s3 cp ./bootstrap-action.sh s3://twde-datalab/
 }
+push_latest_configuration_file(){
+  aws s3 cp ./configuration.json s3://twde-datalab/
+}
 
 
 while getopts 'n:' arg
@@ -49,6 +52,7 @@ do
 done
 echo  
 
+push_latest_configuration_file
 push_latest_bootstrap_actions
 createCluster
 sshWithKeypair
