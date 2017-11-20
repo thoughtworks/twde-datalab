@@ -20,7 +20,7 @@ createCluster () {
     --log-uri 's3n://aws-logs-920822283306-eu-west-1/elasticmapreduce/' \
     --instance-groups '[{"InstanceCount":2,"InstanceGroupType":"CORE","InstanceType":"r3.xlarge","Name":"Core - 2"},{"InstanceCount":1,"InstanceGroupType":"MASTER","InstanceType":"r3.xlarge","Name":"Master - 1"}]' \
     --auto-scaling-role EMR_AutoScaling_DefaultRole \
-    --bootstrap-action "Path=s3://twde-datalab/emr-install.sh" \
+    --bootstrap-action "Path=s3://twde-datalab/bootstrap-action.sh" \
     --ebs-root-volume-size 10 \
     --service-role EMR_DefaultRole \
     --enable-debugging \
@@ -36,7 +36,7 @@ sshWithKeypair() {
 }
 
 push_latest_bootstrap_actions(){
-  aws s3 cp ./emr-install.sh s3://twde-datalab/
+  aws s3 cp ./bootstrap-action.sh s3://twde-datalab/
 }
 
 
