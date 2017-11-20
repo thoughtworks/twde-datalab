@@ -26,8 +26,11 @@ createCluster () {
     --enable-debugging \
     --name ${cluster_name:-'Deployed from CLI'} \
     --scale-down-behavior TERMINATE_AT_INSTANCE_HOUR \
-    --region eu-west-1
+    --region eu-west-1 \
+    --steps Type=CUSTOM_JAR,Name=CustomJAR,ActionOnFailure=CONTINUE,Jar=s3://eu-west-1.elasticmapreduce/libs/script-runner/script-runner.jar,Args=["s3://twde-datalab/steps/zeppelin-python-version.sh"]
 }
+
+
 
 sshWithKeypair() {
   echo "Connecting to cluster via ssh on port 8157"
