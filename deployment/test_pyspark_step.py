@@ -1,12 +1,9 @@
 from pyspark.sql import SparkSession
-# import os
 spark = SparkSession \
     .builder \
     .appName("Test Comp") \
     .config("spark.driver.memory", "4g")  \
     .getOrCreate()
-# .config("fs.s3n.awsAccessKeyId", os.environ['AWS_ACCESS_KEY_ID']) \
-# .config("fs.s3n.awsSecretAccessKey", os.environ['AWS_SECRET_ACCESS_KEY']) \
 
 
 def table_attribute_formatter(table_name, column_names):
@@ -32,8 +29,10 @@ def leftOuterJoin(left_table, right_table, on_column, columns_to_join):
     return train_items
 
 
+print("Running main function")
 if __name__ == "__main__":
     tables = ["stores"]
     for t in tables:
         df = spark.read.csv("s3://twde-datalab/raw/{table}.csv".format(table=t))
         print(df.show())
+        df = spark.write.csv("s3://twde-datalab/raw/{table}_test.csv".format(table=t))
