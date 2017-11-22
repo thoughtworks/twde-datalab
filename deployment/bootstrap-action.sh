@@ -19,4 +19,6 @@ sudo python3 -m pip install plotly
 sudo python3 -m pip install seaborn
 sudo python3 -m pip install boto3
 sudo python3 -m pip install pyspark
+sudo python3 -m pip install pyarrow
+sudo python3 -m pip install s3fs
 
