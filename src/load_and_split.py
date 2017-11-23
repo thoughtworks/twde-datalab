@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     print("this will only print if running python load_and_split.py")
     s3bucket = "twde-datalab"
-    s3bigTablePath = "/data/v5/bigTable.csv"
+    s3bigTablePath = "data/v5/bigTable.csv"
 
     s3 = boto3.client('s3')
     obj = s3.get_object(Bucket=s3bucket, Key=s3bigTablePath)
