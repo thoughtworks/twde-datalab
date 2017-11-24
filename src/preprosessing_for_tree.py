@@ -1,12 +1,8 @@
-
-
 import pandas as pd
-import numpy as np
-
 
 
 def convert_date_column(df):
-    df['date']=pd.to_datetime(df['date'], format="%Y-%m-%d")
+    df['date'] = pd.to_datetime(df['date'], format="%Y-%m-%d")
 
     df["day"] = df['date'].map(lambda x: x.day)
     df["month"] = df['date'].map(lambda x: x.month)
@@ -21,9 +17,8 @@ def encode_categorical_columns(df):
     from sklearn.preprocessing import LabelEncoder
     lb = LabelEncoder()
     for col in obj_df.columns:
-        col_code = col+"_code"
         df[col] = lb.fit_transform(obj_df[col])
-    print("encoded categorical columns:", obj_df)
+    print("encoded categorical columns:", obj_df.columns)
     return df
 
 
@@ -33,5 +28,3 @@ def preprocess_for_trees(df):
     print("filled na values of onpromotion column")
     df = encode_categorical_columns(df)
     return df
-
-
