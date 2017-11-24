@@ -16,6 +16,21 @@ def split_validation_train_by_validation_period(train, validation_begin_date, va
     train_train = train[train['date']< validation_begin_date]
     return train_train, train_validation
 
+def move_items_from_train_to_validation(train, validation, items_to_remove):
+    train2 = train[~train.item_nbr.isin(items_to_remove)]
+    validation_to_add = training[training.item_nbr.isin(items_to_remove)]
+    validation2 = validation.append(validation_to_add)
+    return train2, validation2
+
+def move_random_items_from_train_to_validation(train, validation, num_items_to_remove):
+    train_items = train['item_nbr'].unique()
+    items_to_remove = np.random.choice(train_items, num_items_to_remove)
+    train2, validation2 = move_items_from_train_to_validation(train, validation, items_to_remove)
+    print("Moved {} items from train data to test data".format(num_items_to_remove))
+    print("train data: {} -> {} rows".format(train.shape[0], train2.shape[0]))
+    print("validation data: {} -> {} rows".format(validation.shape[0], validation2.shape[0]))
+    return train2, validation2
+
 if __name__ == "__main__":
     aws_akid = os.environ['AWS_ID']
     aws_seckey = os.environ['AWS_SECRET']
