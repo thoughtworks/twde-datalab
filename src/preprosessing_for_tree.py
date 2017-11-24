@@ -24,7 +24,7 @@ def encode_categorical_columns(df):
 
 def preprocess_for_trees(df):
     df = convert_date_column(df)
-    df['onpromotion'] = df['onpromotion'].fillna(value=-1)
-    print("filled na values of onpromotion column")
+    df = df.fillna(-1)
+    print("filled na values with -1")
     df = encode_categorical_columns(df)
     return df
