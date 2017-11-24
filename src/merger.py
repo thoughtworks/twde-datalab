@@ -1,12 +1,9 @@
 from pyspark.sql import SparkSession
-# import os
 spark = SparkSession \
     .builder \
     .appName("Test Comp") \
     .config("spark.driver.memory", "4g")  \
     .getOrCreate()
-# .config("fs.s3n.awsAccessKeyId", os.environ['AWS_ACCESS_KEY_ID']) \
-# .config("fs.s3n.awsSecretAccessKey", os.environ['AWS_SECRET_ACCESS_KEY']) \
 
 
 def table_attribute_formatter(table_name, column_names):
@@ -16,7 +13,7 @@ def table_attribute_formatter(table_name, column_names):
 def loj_sql_formatter(right_attributes, on_column, extra_on_column=None):
     statement = """SELECT left.*, {right_table_attributes} FROM left LEFT JOIN right ON left.{on_column} = right.{on_column}""".format(right_table_attributes=right_attributes, on_column=on_column)
     if extra_on_column:
-        statement += " AND left.{extra_on_column} = right.{extra_on_column}".format(extra_on_column=extra_on_column)
+        statement += " & left.{extra_on_column} = right.{extra_on_column}".format(extra_on_column=extra_on_column)
     return statement
 
 
@@ -37,20 +34,25 @@ def leftOuterJoin(left_table, right_table, on_column, columns_to_join, extra_on_
 
 if __name__ == "__main__":
     # Load all tables from raw data
-    tables = {'stores': None, 'items': None, 'train': None, 'transactions': None}
+    tables = {'stores': None, 'items': None, 'train': None, 'transactions': None, 'cities': None}
     for t in tables.keys():
         tables[t] = spark.read.csv("../data/{table}.csv".format(table=t), header='true')
     # Join train.csv and items.csv on item_nbr, preserving all columns
+    print("Joining train.csv and items.csv")
     bigTable = leftOuterJoin(tables['train'], tables['items'], 'item_nbr', ['family', 'class', 'perishable'])
 
     # Add stores.csv to big table on store_nbr, preserving all columns
+    print("Joining stores.csv to bigTable")
     bigTable = leftOuterJoin(bigTable, tables['stores'], 'store_nbr', ['city', 'state', 'type', 'cluster'])
 
     # Add transactions to big table on store_nbr and date
+    print("Joining transactions.csv to bigTable")
     bigTable = leftOuterJoin(bigTable, tables['transactions'], 'store_nbr', ['transactions'], extra_on_column='date')
 
     # Add cities to big table on city and preserve all columns
-    bigTable = leftOuterJoin(bigTable, tables['transactions'], 'store_nbr', ['transactions'], extra_on_column='date')
+    print("Joining cities.csv to bigTable")
+    # bigTable = leftOuterJoin(bigTable, tables['cities'], 'city', [x for x in tables['cities'] if x != 'city'])
 
     # Write data to parquet file:
-    bigTable.write.parquet('../data/bigTable')
+    print("Writing bigTable to file")
+    bigTable.write.csv('../data/v4/bigTable.csv')
