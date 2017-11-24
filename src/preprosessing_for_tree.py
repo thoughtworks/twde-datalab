@@ -13,16 +13,17 @@ def convert_date_column(df):
 
 
 def encode_categorical_columns(df):
-    obj_df = df.select_dtypes(include=['object']).copy()
+    obj_df = df.select_dtypes(include=['object', 'bool']).copy()
     from sklearn.preprocessing import LabelEncoder
     lb = LabelEncoder()
     for col in obj_df.columns:
         df[col] = lb.fit_transform(obj_df[col])
-    print("encoded categorical columns:", obj_df.columns)
+    # print("encoded categorical columns:", obj_df.columns)
     return df
 
 
 def preprocess_for_trees(df):
+    print("new import is working")
     df = convert_date_column(df)
     df = df.fillna(-1)
     print("filled na values with -1")

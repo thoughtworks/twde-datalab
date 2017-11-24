@@ -5,23 +5,27 @@ import s3fs
 import datetime
 from io import StringIO
 
-#we want from wednesday to thursday (encoded as int 3) for a 15 day period
+
 def get_validation_period(latest_date_train):
-    offset = (latest_date_train.weekday()-3) % 7
+    # we want from wednesday to thursday (encoded as int 3) for a 15 day period
+    offset = (latest_date_train.weekday() - 3) % 7
     end_of_validation_period = latest_date_train - pd.DateOffset(days=offset)
     begin_of_validation_period = end_of_validation_period - pd.DateOffset(days=15)
     return (begin_of_validation_period, end_of_validation_period)
 
+
 def split_validation_train_by_validation_period(train, validation_begin_date, validation_end_date):
-    train_validation= train[(train['date']>= validation_begin_date) & (train['date']<= validation_end_date) ]
+    train_validation= train[(train['date'] >= validation_begin_date) & (train['date'] <= validation_end_date) ]
     train_train = train[train['date']< validation_begin_date]
     return train_train, train_validation
+
 
 def move_items_from_train_to_validation(train, validation, items_to_remove):
     train2 = train[~train.item_nbr.isin(items_to_remove)]
     validation_to_add = training[training.item_nbr.isin(items_to_remove)]
     validation2 = validation.append(validation_to_add)
     return train2, validation2
+
 
 def move_random_items_from_train_to_validation(train, validation, num_items_to_remove):
     train_items = train['item_nbr'].unique()
@@ -38,7 +42,7 @@ if __name__ == "__main__":
 
     print("this will only print if running python load_and_split.py")
     s3bucket = "twde-datalab"
-    #TODO change input path to 'merger/{find latest output date}/bigTable.csv'
+    # TODO change input path to 'merger/{find latest output date}/bigTable.csv'
     s3bigTablePath = "data/v7/bigTable2016-2017.csv"
 
     s3 = boto3.client('s3')
