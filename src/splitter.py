@@ -2,9 +2,10 @@ import pandas as pd
 import boto3
 import os
 import s3fs
+import datetime
 from io import StringIO
 
-#we want from wednesday to thursday (3) for 2 weeks
+#we want from wednesday to thursday (encoded as int 3) for a 15 day period
 def get_validation_period(latest_date_train):
     offset = (latest_date_train.weekday()-3) % 7
     end_of_validation_period = latest_date_train - pd.DateOffset(days=offset)
@@ -37,7 +38,8 @@ if __name__ == "__main__":
 
     print("this will only print if running python load_and_split.py")
     s3bucket = "twde-datalab"
-    s3bigTablePath = "data/v5/bigTable.csv"
+    #TODO change input path to 'merger/{find latest output date}/bigTable.csv'
+    s3bigTablePath = "data/v7/bigTable2016-2017.csv"
 
     s3 = boto3.client('s3')
     obj = s3.get_object(Bucket=s3bucket, Key=s3bigTablePath)
@@ -60,7 +62,7 @@ if __name__ == "__main__":
 
     train_train, train_validation = split_validation_train_by_validation_period(train, begin_of_validation, end_of_validation)
 
-    s3ValidationDataPath = "s3://twde-datalab/data/v5/val/"
+    s3ValidationDataPath = "s3://twde-datalab/splitter/" + datetime.datetime.now().isoformat() + "/"
 
     fs = s3fs.S3FileSystem(key=aws_akid, secret=aws_seckey)
 
