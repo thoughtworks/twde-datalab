@@ -4,6 +4,7 @@ import os
 import s3fs
 import datetime
 from io import StringIO
+import numpy as np
 
 
 def get_validation_period(latest_date_train):
@@ -15,8 +16,8 @@ def get_validation_period(latest_date_train):
 
 
 def split_validation_train_by_validation_period(train, validation_begin_date, validation_end_date):
-    train_validation= train[(train['date'] >= validation_begin_date) & (train['date'] <= validation_end_date) ]
-    train_train = train[train['date']< validation_begin_date]
+    train_validation = train[(train['date'] >= validation_begin_date) & (train['date'] <= validation_end_date)]
+    train_train = train[train['date'] < validation_begin_date]
     return train_train, train_validation
 
 
@@ -35,6 +36,7 @@ def move_random_items_from_train_to_validation(train, validation, num_items_to_r
     print("train data: {} -> {} rows".format(train.shape[0], train2.shape[0]))
     print("validation data: {} -> {} rows".format(validation.shape[0], validation2.shape[0]))
     return train2, validation2
+
 
 if __name__ == "__main__":
     aws_akid = os.environ['AWS_ID']
