@@ -34,8 +34,12 @@ def load_data(s3, s3bucket):
     validate_csv_string = validateBody.read().decode('utf-8')
     validate = pd.read_csv(StringIO(validate_csv_string))
 
+    dataset = "latest"
+    latestContents = s3.get_object(Bucket='twde-datalab', Key='merger/{}'.format(dataset))['Body']
+    latest = latestContents.read().decode('utf-8').strip()
+
     print("Loading test data from raw/test.csv")
-    testPath = "raw/test.csv"
+    testPath = "merger/{}/bigTestTable.csv".format(latest)
     testObj = s3.get_object(Bucket=s3bucket, Key=testPath)
     testBody = testObj['Body']
     test_csv_string = testBody.read().decode('utf-8')

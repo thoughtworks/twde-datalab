@@ -6,8 +6,7 @@ from io import StringIO
 import boto3
 
 
-def load_data(sample):
-    s3 = boto3.client('s3')
+def load_data(s3, sample):
     s3bucket = "twde-datalab"
     # Load all tables from raw data
     tables = {}
@@ -16,7 +15,7 @@ def load_data(sample):
         tables_to_download.append('sample_train')
         tables_to_download.append('sample_test')
     else:
-        tables_to_download.append('train')
+        tables_to_download.append('last_year_train')
         tables_to_download.append('test')
 
     for t in tables_to_download:
@@ -41,31 +40,31 @@ def filter_for_latest_year(train):
     return train[train['date'] > year_offset]
 
 
-def join_tables_to_train_data(tables, timestamp, sample, truncate=True):
+def join_tables_to_train_data(s3, tables, timestamp, sample, truncate=True):
     filename = 'bigTable'
     if sample:
         table = 'sample_train'
     else:
-        table = 'train'
+        table = 'last_year_train'
 
-    if truncate:
-        # Use only the latest year worth of data
-        tables[table] = filter_for_latest_year(tables[table])
-        filename += '2016-2017'
-
+    # this is not necessary if we download truncated data
+    # if truncate:
+    #    # Use only the latest year worth of data
+    #    tables[table] = filter_for_latest_year(tables[table])
+    filename += '2016-2017'
     filename += '.csv'
     bigTable = add_tables(table)
-    write_data_to_s3(bigTable, filename, timestamp)
+    write_data_to_s3(s3, bigTable, filename, timestamp)
 
 
-def join_tables_to_test_data(tables, timestamp, sample):
+def join_tables_to_test_data(s3, tables, timestamp, sample):
     if sample:
         table = 'sample_test'
     else:
         table = 'test'
     bigTable = add_tables(table)
     filename = 'bigTestTable.csv'
-    write_data_to_s3(bigTable, filename, timestamp)
+    write_data_to_s3(s3, bigTable, filename, timestamp)
 
 
 def add_tables(base_table):
@@ -83,7 +82,7 @@ def add_tables(base_table):
     return bigTable
 
 
-def write_data_to_s3(table, filename, timestamp):
+def write_data_to_s3(s3, table, filename, timestamp):
 
     s3bucket = "twde-datalab"
 
@@ -98,15 +97,17 @@ def write_data_to_s3(table, filename, timestamp):
     bytes_to_write = table.to_csv(None, index=False).encode()
     with fs.open(s3path + filename, 'wb') as f:
        f.write(bytes_to_write)
+    s3.put_object(Body=timestamp, Bucket=s3bucket, Key='merger/latest')
 
 
 if __name__ == "__main__":
+    s3 = boto3.client('s3')
     timestamp = datetime.datetime.now().isoformat()
     sample = False
-    tables = load_data(sample)
+    tables = load_data(s3, sample)
 
     print("Joining data to train.csv to make bigTable")
-    join_tables_to_train_data(tables, timestamp, sample)
+    join_tables_to_train_data(s3, tables, timestamp, sample)
 
     print("Joining data to test.csv to make bigTable")
-    join_tables_to_test_data(tables, timestamp, sample)
+    join_tables_to_test_data(s3, tables, timestamp, sample)
