@@ -51,24 +51,19 @@ if __name__ == "__main__":
 
     s3bigTablePath = "merger/{latest}/bigTable2016-2017.csv".format(latest=latest)
 
+    print("Downloading latest bigTable from {}".format(s3bigTablePath))
     obj = s3.get_object(Bucket=s3bucket, Key=s3bigTablePath)
     body = obj['Body']
     csv_string = body.read().decode('utf-8')
     train = pd.read_csv(StringIO(csv_string))
 
-    print("read to pandas dataframe")
-
     train['date'] = pd.to_datetime(train['date'], format="%Y-%m-%d")
-
-    print(train.shape)
 
     latest_date = train['date'].max()
 
     begin_of_validation, end_of_validation = get_validation_period(latest_date)
 
-    print(begin_of_validation)
-    print(end_of_validation)
-
+    print("Splitting data between {} and {}".format(begin_of_validation, end_of_validation))
     train_train, train_validation = split_validation_train_by_validation_period(train, begin_of_validation, end_of_validation)
 
     timestamp = datetime.datetime.now().isoformat()
@@ -77,14 +72,15 @@ if __name__ == "__main__":
 
     fs = s3fs.S3FileSystem(key=aws_akid, secret=aws_seckey)
 
-    print("writing train...")
+    print("Writing train to {}train.csv".format(s3ValidationDataPath))
 
     bytes_to_write = train_train.to_csv(None, index=False).encode()
     with fs.open(s3ValidationDataPath + 'train.csv', 'wb') as f:
         f.write(bytes_to_write)
 
-    print("writing test...")
+    print("Writing test to {}test.csv".format(s3ValidationDataPath))
 
     bytes_to_write = train_validation.to_csv(None, index=False).encode()
     with fs.open(s3ValidationDataPath + 'test.csv', 'wb') as f:
         f.write(bytes_to_write)
+    print("Done")
