@@ -7,13 +7,15 @@ import pandas as pd
 import datetime
 from statsmodels.tsa.arima_model import ARIMA
 
+# FORECASTS THE UNIT SALES FOR ONE ITEM/STORE COMBINATION
+# Usage example: 'python src/arima_per_item_forecast.py ./splitter/train.csv ./splitter/test.csv 1503844 47 ./arima_forecast/'
 if __name__ == "__main__":
     pathToTrainingSetFile = sys.argv[1]
     pathToValidationSetFile = sys.argv[2]
     itemNumber = sys.argv[3]
     storeNumber = sys.argv[4]
     predictionsOutputPath = sys.argv[5]
-    predictionsOutputFile = predictionsOutputPath + '_' + itemNumber + '_' + storeNumber + '.csv'
+    predictionsOutputFile = predictionsOutputPath + 'predictions_' + itemNumber + '_' + storeNumber + '.csv'
 
     train=pd.read_csv(pathToTrainingSetFile)
     train['date']=train.date.apply(lambda x:datetime.datetime.strptime(x, '%Y-%m-%d'))
