@@ -84,11 +84,10 @@ def make_predictions(clf, validate):
 def write_predictions_and_score_to_s3(s3, s3bucket, test_predictions, validation_score, model, timestamp, test, columns_used):
     aws_akid = os.environ['AWS_ID']
     aws_seckey = os.environ['AWS_SECRET']
+    fs = s3fs.S3FileSystem(key=aws_akid, secret=aws_seckey)
 
     key = "decision_tree/{timestamp}".format(timestamp=timestamp.isoformat())
     s3path = "s3://{s3bucket}/{key}/".format(s3bucket=s3bucket, key=key)
-
-    fs = s3fs.S3FileSystem(key=aws_akid, secret=aws_seckey)
 
     s3.put_object(Body=timestamp.isoformat(), Bucket=s3bucket, Key='decision_tree/latest')
 
@@ -120,6 +119,21 @@ def write_predictions_and_score_to_s3(s3, s3bucket, test_predictions, validation
     #     obj_reloaded = joblib.load(s3_file)
 
 
+def write_evaluation_data_to_s3(s3, s3bucket, predictions, targets, weights):
+    aws_akid = os.environ['AWS_ID']
+    aws_seckey = os.environ['AWS_SECRET']
+    fs = s3fs.S3FileSystem(key=aws_akid, secret=aws_seckey)
+
+    key = "decision_tree/{timestamp}".format(timestamp=timestamp.isoformat())
+    s3path = "s3://{s3bucket}/{key}/".format(s3bucket=s3bucket, key=key)
+
+    print("Writing evaluation data to {}".format(s3path))
+    evaluation_data = pd.DataFrame({'predictions': predictions, 'targets': targets, 'weights': weights})
+    bytes_to_write = evaluation_data.to_csv(None, index=False).encode()
+    with fs.open(s3path + 'evaluation_data.csv', 'wb') as f:
+       f.write(bytes_to_write)
+
+
 if __name__ == "__main__":
 
     timestamp = datetime.datetime.now()
@@ -135,5 +149,7 @@ if __name__ == "__main__":
     validation_score = evaluation.nwrmsle(validation_predictions, validate['unit_sales'], validate['perishable'])
 
     test_predictions = make_predictions(model, test)
+
+    write_evaluation_data_to_s3(s3, s3bucket, validation_predictions, validate['unit_sales'], validate['perishable'])
 
     write_predictions_and_score_to_s3(s3, s3bucket, test_predictions, validation_score, model, timestamp, original_test, original_train.columns)
