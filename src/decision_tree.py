@@ -15,6 +15,7 @@ import evaluation
 
 
 def load_data(s3, s3bucket):
+    # dataset = "sample_data_path"  # for running on a smaller sample of data
     dataset = "latest"
     latestContents = s3.get_object(Bucket='twde-datalab', Key='splitter/{}'.format(dataset))['Body']
     latest = latestContents.read().decode('utf-8').strip()
