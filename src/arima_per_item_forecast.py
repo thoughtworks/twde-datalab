@@ -12,10 +12,10 @@ from statsmodels.tsa.arima_model import ARIMA
 if __name__ == "__main__":
     pathToTrainingSetFile = sys.argv[1]
     pathToValidationSetFile = sys.argv[2]
-    itemNumber = sys.argv[3]
-    storeNumber = sys.argv[4]
+    itemNumber = int(sys.argv[3])
+    storeNumber = int(sys.argv[4])
     predictionsOutputPath = sys.argv[5]
-    predictionsOutputFile = predictionsOutputPath + 'predictions_' + itemNumber + '_' + storeNumber + '.csv'
+    predictionsOutputFile = predictionsOutputPath + 'predictions_' + str(itemNumber) + '_' + str(storeNumber) + '.csv'
 
     train=pd.read_csv(pathToTrainingSetFile)
     train['date']=train.date.apply(lambda x:datetime.datetime.strptime(x, '%Y-%m-%d'))
@@ -53,5 +53,5 @@ if __name__ == "__main__":
 
     predictions_series = pd.Series(predictions, index = ts_test.index)
 
-    predictions_series.to_csv(predictionsOutputFile, index=False)
+    predictions_series.to_csv(predictionsOutputFile)
 
