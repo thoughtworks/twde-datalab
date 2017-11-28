@@ -1,6 +1,31 @@
 import pandas as pd
 import datetime
 import os
+import s3fs
+from io import StringIO
+import boto3
+
+
+def load_data(sample):
+    s3 = boto3.client('s3')
+    s3bucket = "twde-datalab"
+    # Load all tables from raw data
+    tables = {}
+    tables_to_download = ['stores', 'items', 'transactions', 'cities']
+    if sample:
+        tables_to_download.append('sample_train')
+        tables_to_download.append('sample_test')
+    else:
+        tables_to_download.append('train')
+        tables_to_download.append('test')
+
+    for t in tables_to_download:
+        key = "raw/{table}.csv".format(table=t)
+        print("Loading data from {}".format(key))
+
+        csv_string = s3.get_object(Bucket=s3bucket, Key=key)['Body'].read().decode('utf-8')
+        tables[t] = pd.read_csv(StringIO(csv_string))
+    return tables
 
 
 def left_outer_join(left_table, right_table, on):
@@ -16,18 +41,31 @@ def filter_for_latest_year(train):
     return train[train['date'] > year_offset]
 
 
-def join_tables_to_train_data():
-    tables['train'] = pd.read_csv("../data/train.csv")
+def join_tables_to_train_data(tables, timestamp, sample, truncate=True):
+    filename = 'bigTable'
+    if sample:
+        table = 'sample_train'
+    else:
+        table = 'train'
 
-    # Use only the latest year worth of data
-    tables['train'] = filter_for_latest_year(tables['train'])
+    if truncate:
+        # Use only the latest year worth of data
+        tables[table] = filter_for_latest_year(tables[table])
+        filename += '2016-2017'
 
-    add_tables('train')
+    filename += '.csv'
+    bigTable = add_tables(table)
+    write_data_to_s3(bigTable, filename, timestamp)
 
 
-def join_tables_to_test_data():
-    tables['test'] = pd.read_csv("../data/test.csv")
-    add_tables('test')
+def join_tables_to_test_data(tables, timestamp, sample):
+    if sample:
+        table = 'sample_test'
+    else:
+        table = 'test'
+    bigTable = add_tables(table)
+    filename = 'bigTestTable.csv'
+    write_data_to_s3(bigTable, filename, timestamp)
 
 
 def add_tables(base_table):
@@ -42,20 +80,33 @@ def add_tables(base_table):
 
     print("Joining cities.csv to bigTable")
     bigTable = left_outer_join(bigTable, tables['cities'], 'city')
+    return bigTable
 
-    print("Writing bigTable to file")
-    path = '../data/merger/{base_table}/{timestamp}/'.format(base_table=base_table, timestamp=datetime.datetime.now().isoformat())
-    if not os.path.exists(path):
-        os.makedirs(path)
-    bigTable.to_csv('{path}bigTable2016-2017.csv'.format(path=path), index=False)
+
+def write_data_to_s3(table, filename, timestamp):
+
+    s3bucket = "twde-datalab"
+
+    aws_akid = os.environ['AWS_ID']
+    aws_seckey = os.environ['AWS_SECRET']
+    fs = s3fs.S3FileSystem(key=aws_akid, secret=aws_seckey)
+
+    key = "merger/{timestamp}".format(timestamp=timestamp)
+    s3path = "s3://{s3bucket}/{key}/".format(s3bucket=s3bucket, key=key)
+
+    print("writing {} data to {}".format(filename, s3path))
+    bytes_to_write = table.to_csv(None, index=False).encode()
+    with fs.open(s3path + filename, 'wb') as f:
+       f.write(bytes_to_write)
 
 
 if __name__ == "__main__":
-    # Load all tables from raw data
-    tables = {'stores': None, 'items': None, 'transactions': None, 'cities': None}
-    for t in tables.keys():
-        print("Reading table: {}".format(t))
-        tables[t] = pd.read_csv("../data/{table}.csv".format(table=t))
+    timestamp = datetime.datetime.now().isoformat()
+    sample = False
+    tables = load_data(sample)
 
-    # join_tables_to_train_data()
-    join_tables_to_test_data()
+    print("Joining data to train.csv to make bigTable")
+    join_tables_to_train_data(tables, timestamp, sample)
+
+    print("Joining data to test.csv to make bigTable")
+    join_tables_to_test_data(tables, timestamp, sample)
