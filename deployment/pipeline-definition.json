@@ -11,7 +11,7 @@
             "schedule": {
                 "ref": "DefaultSchedule"
             },
-            "scriptUri": "s3://twde-datalab/run_pipeline.sh",
+            "scriptUri": "s3://twde-datalab/run_pipeline_job.sh",
             "name": "DefaultActivity1",
             "id": "ActivityId_qyoFQ",
             "runsOn": {
@@ -24,11 +24,11 @@
                 "ref": "DefaultSchedule"
             },
             "imageId": "ami-1a962263",
-            "instanceType": "t2.medium",
+            "instanceType": "r4.2xlarge",
             "name": "DefaultResource1",
             "id": "datalab-machine",
             "type": "Ec2Resource",
-            "terminateAfter": "30 Minutes",
+            "terminateAfter": "500 Minutes",
             "keyPair": "keypair"
         },
         {
