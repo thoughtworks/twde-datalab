@@ -15,7 +15,7 @@ import evaluation
 
 
 def load_data(s3, s3bucket):
-    # dataset = "sample_data_path"  # for running on a smaller sample of data
+    # dataset = "sample_data_path"  # for running on a very small sample of data
     dataset = "latest"
     latestContents = s3.get_object(Bucket='twde-datalab', Key='splitter/{}'.format(dataset))['Body']
     latest = latestContents.read().decode('utf-8').strip()
@@ -96,11 +96,13 @@ def write_predictions_and_score_to_s3(s3, s3bucket, test_predictions, validation
 
     s3.put_object(Body=timestamp.isoformat(), Bucket=s3bucket, Key='decision_tree/latest')
 
-    print("Writing test_predictions to {}".format(s3path))
+    print("Writing {}submission.csv".format(s3path))
     test_predictions = pd.DataFrame({'unit_sales': test_predictions})
-    predictions = test.join(test_predictions).drop(['date', 'store_nbr', 'item_nbr', 'onpromotion'], axis=1)
+    predictions = test.join(test_predictions)[['id', 'unit_sales']]
+    predictions.loc[predictions['unit_sales'] < 0, 'unit_sales'] = 0
+    predictions['unit_sales'] = predictions['unit_sales'].round().astype(int)
     bytes_to_write = predictions.to_csv(None, index=False).encode()
-    with fs.open(s3path + 'test_predictions.csv', 'wb') as f:
+    with fs.open(s3path + 'submission.csv', 'wb') as f:
        f.write(bytes_to_write)
 
     print("Writing model as pickle to {}".format(s3path))
@@ -112,7 +114,7 @@ def write_predictions_and_score_to_s3(s3, s3bucket, test_predictions, validation
     with s3io.open('s3://{0}/{1}'.format(s3bucket, key), mode='w', **credentials) as s3_file:
         joblib.dump(model, s3_file, compress=compress)
 
-    print("Writing validation_score and metadata to {}".format(s3path))
+    print("Writing {}validation_score.csv".format(s3path))
     timediff = (datetime.datetime.now() - timestamp).total_seconds() / 60
     bytes_to_write = pd.DataFrame({'runtime_minutes': [timediff], 'estimate': [validation_score], 'columns_used': [columns_used]}).to_csv(None, index=False).encode()
     with fs.open(s3path + 'validation_score.csv', 'wb') as f:
