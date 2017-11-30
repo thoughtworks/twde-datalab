@@ -21,4 +21,4 @@ mkdir -p src && cd src
 aws s3 cp s3://twde-datalab/src.tar.gz .
 tar xzf src.tar.gz
 
-python36 %%JOBNAME%%.py
+# Jobs to be executed will be appeneded below

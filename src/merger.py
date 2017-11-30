@@ -3,6 +3,7 @@ import datetime
 from io import StringIO
 import boto3
 
+
 def load_data(s3, sample):
     s3bucket = "twde-datalab"
     # Load all tables from raw data
@@ -90,6 +91,7 @@ def write_data_to_s3(s3, table, filename, timestamp):
     csv_buffer = StringIO()
     table.to_csv(csv_buffer, index=False)
     s3.put_object(Bucket=s3bucket, Key='{key}/{filename}'.format(key=key, filename=filename), Body=csv_buffer.getvalue())
+
 
 if __name__ == "__main__":
     s3 = boto3.client('s3')
