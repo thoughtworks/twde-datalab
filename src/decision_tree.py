@@ -3,8 +3,8 @@ import datetime
 import sys
 import os
 import s3fs
+import io
 import boto3
-import s3io
 import joblib
 from io import StringIO
 sys.path.append(os.path.join('..', 'src'))
@@ -87,43 +87,36 @@ def make_predictions(clf, validate):
 
 
 def write_predictions_and_score_to_s3(s3, s3bucket, test_predictions, validation_score, model, timestamp, test, columns_used):
-    aws_akid = os.environ['AWS_ID']
-    aws_seckey = os.environ['AWS_SECRET']
-    fs = s3fs.S3FileSystem(key=aws_akid, secret=aws_seckey)
-
     key = "decision_tree/{timestamp}".format(timestamp=timestamp.isoformat())
-    s3path = "s3://{s3bucket}/{key}/".format(s3bucket=s3bucket, key=key)
 
     s3.put_object(Body=timestamp.isoformat(), Bucket=s3bucket, Key='decision_tree/latest')
 
-    print("Writing {}submission.csv".format(s3path))
+    filename = 'submission.csv'
+    print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
     test_predictions = pd.DataFrame({'unit_sales': test_predictions})
     predictions = test.join(test_predictions)[['id', 'unit_sales']]
     predictions.loc[predictions['unit_sales'] < 0, 'unit_sales'] = 0
     predictions['unit_sales'] = predictions['unit_sales'].round().astype(int)
-    bytes_to_write = predictions.to_csv(None, index=False).encode()
-    with fs.open(s3path + 'submission.csv', 'wb') as f:
-       f.write(bytes_to_write)
 
-    print("Writing model as pickle to {}".format(s3path))
-    compress = ('gzip', 3)
-    credentials = dict(
-        aws_access_key_id=aws_akid,
-        aws_secret_access_key=aws_seckey,
-    )
-    with s3io.open('s3://{0}/{1}'.format(s3bucket, key), mode='w', **credentials) as s3_file:
-        joblib.dump(model, s3_file, compress=compress)
+    csv_buffer = io.StringIO()
+    predictions.to_csv(csv_buffer, index=False)
+    s3.put_object(Bucket=s3bucket, Key='{key}/{filename}'.format(key=key, filename=filename), Body=csv_buffer.getvalue())
 
-    print("Writing {}validation_score.csv".format(s3path))
+    filename = 'model.pkl'
+    print("Writing model as pickle to s3://{}/{}/{}".format(s3bucket, key, filename))
+    joblib.dump(model, './model.pkl')
+    s3.put_object(Bucket=s3bucket, Key='{key}/'.format(key=key), Body='./model.pkl')
+
+    filename = 'score_and_metadata.csv'
+    print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
     timediff = (datetime.datetime.now() - timestamp).total_seconds() / 60
-    bytes_to_write = pd.DataFrame({'runtime_minutes': [timediff], 'estimate': [validation_score], 'columns_used': [columns_used]}).to_csv(None, index=False).encode()
-    with fs.open(s3path + 'validation_score.csv', 'wb') as f:
-        f.write(bytes_to_write)
-    print("Done. Time elapsed (minutes): {timediff}".format(timediff=timediff))
+    score = pd.DataFrame({'runtime_minutes': [timediff], 'estimate': [validation_score], 'columns_used': [columns_used]})
 
-    # To open this pickle:
-    # with s3io.open('s3://{0}/{1}'.format(bucket, key), mode='r', **credentials) as s3_file:
-    #     obj_reloaded = joblib.load(s3_file)
+    csv_buffer = io.StringIO()
+    score.to_csv(csv_buffer, index=False)
+    s3.put_object(Bucket=s3bucket, Key='{key}/{filename}'.format(key=key, filename=filename), Body=csv_buffer.getvalue())
+
+    print("Done. Time elapsed (minutes): {timediff}".format(timediff=timediff))
 
 
 def write_evaluation_data_to_s3(s3, s3bucket, predictions, targets, weights):
