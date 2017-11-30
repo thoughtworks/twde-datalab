@@ -1,58 +1,113 @@
-from pyspark.sql import SparkSession
-spark = SparkSession \
-    .builder \
-    .appName("Test Comp") \
-    .config("spark.driver.memory", "4g")  \
-    .getOrCreate()
+import pandas as pd
+import datetime
+import os
+import s3fs
+from io import StringIO
+import boto3
 
 
-def table_attribute_formatter(table_name, column_names):
-    return "{}".format(", ".join([table_name + '.{}'.format(x) for x in column_names]))
+def load_data(s3, sample):
+    s3bucket = "twde-datalab"
+    # Load all tables from raw data
+    tables = {}
+    tables_to_download = ['stores', 'items', 'transactions', 'cities']
+    if sample:
+        tables_to_download.append('sample_train')
+        tables_to_download.append('sample_test')
+    else:
+        tables_to_download.append('last_year_train')
+        tables_to_download.append('test')
+
+    for t in tables_to_download:
+        key = "raw/{table}.csv".format(table=t)
+        print("Loading data from {}".format(key))
+
+        csv_string = s3.get_object(Bucket=s3bucket, Key=key)['Body'].read().decode('utf-8')
+        tables[t] = pd.read_csv(StringIO(csv_string))
+    return tables
 
 
-def loj_sql_formatter(right_attributes, on_column, extra_on_column=None):
-    statement = """SELECT left.*, {right_table_attributes} FROM left LEFT JOIN right ON left.{on_column} = right.{on_column}""".format(right_table_attributes=right_attributes, on_column=on_column)
-    if extra_on_column:
-        statement += " & left.{extra_on_column} = right.{extra_on_column}".format(extra_on_column=extra_on_column)
-    return statement
+def left_outer_join(left_table, right_table, on):
+    new_table = left_table.merge(right_table, how='left', on=on)
+    return new_table
 
 
-def leftOuterJoin(left_table, right_table, on_column, columns_to_join, extra_on_column=None):
-    """ Takes two Spark DataFrames and performs a left outer join on them
-        Returns a Spark DataFrame"""
-    left_table.createOrReplaceTempView("left")
-    right_table.createOrReplaceTempView("right")
+def filter_for_latest_year(train):
+    train['date'] = pd.to_datetime(train['date'])
+    latest_date = train['date'].max()
+    year_offset = latest_date - pd.DateOffset(days=365)
+    print("Filtering for dates after {}".format(year_offset))
+    return train[train['date'] > year_offset]
 
-    right_attributes = table_attribute_formatter("right", columns_to_join)
 
-    sql_statement = loj_sql_formatter(right_attributes, on_column, extra_on_column)
+def join_tables_to_train_data(s3, tables, timestamp, sample, truncate=True):
+    filename = 'bigTable'
+    if sample:
+        table = 'sample_train'
+    else:
+        table = 'last_year_train'
 
-    # returns a spark dataframe
-    train_items = spark.sql(sql_statement)
-    return train_items
+    # this is not necessary if we download truncated data
+    # if truncate:
+    #    # Use only the latest year worth of data
+    #    tables[table] = filter_for_latest_year(tables[table])
+    filename += '2016-2017'
+    filename += '.csv'
+    bigTable = add_tables(table)
+    write_data_to_s3(s3, bigTable, filename, timestamp)
+
+
+def join_tables_to_test_data(s3, tables, timestamp, sample):
+    if sample:
+        table = 'sample_test'
+    else:
+        table = 'test'
+    bigTable = add_tables(table)
+    filename = 'bigTestTable.csv'
+    write_data_to_s3(s3, bigTable, filename, timestamp)
+
+
+def add_tables(base_table):
+    print("Joining {}.csv and items.csv".format(base_table))
+    bigTable = left_outer_join(tables[base_table], tables['items'], 'item_nbr')
+
+    print("Joining stores.csv to bigTable")
+    bigTable = left_outer_join(bigTable, tables['stores'], 'store_nbr')
+
+    print("Joining transactions.csv to bigTable")
+    bigTable = left_outer_join(bigTable, tables['transactions'], ['store_nbr', 'date'])
+
+    print("Joining cities.csv to bigTable")
+    bigTable = left_outer_join(bigTable, tables['cities'], 'city')
+    return bigTable
+
+
+def write_data_to_s3(s3, table, filename, timestamp):
+
+    s3bucket = "twde-datalab"
+
+    aws_akid = os.environ['AWS_ID']
+    aws_seckey = os.environ['AWS_SECRET']
+    fs = s3fs.S3FileSystem(key=aws_akid, secret=aws_seckey)
+
+    key = "merger/{timestamp}".format(timestamp=timestamp)
+    s3path = "s3://{s3bucket}/{key}/".format(s3bucket=s3bucket, key=key)
+
+    print("writing {} data to {}".format(filename, s3path))
+    bytes_to_write = table.to_csv(None, index=False).encode()
+    with fs.open(s3path + filename, 'wb') as f:
+       f.write(bytes_to_write)
+    s3.put_object(Body=timestamp, Bucket=s3bucket, Key='merger/latest')
 
 
 if __name__ == "__main__":
-    # Load all tables from raw data
-    tables = {'stores': None, 'items': None, 'train': None, 'transactions': None, 'cities': None}
-    for t in tables.keys():
-        tables[t] = spark.read.csv("../data/{table}.csv".format(table=t), header='true')
-    # Join train.csv and items.csv on item_nbr, preserving all columns
-    print("Joining train.csv and items.csv")
-    bigTable = leftOuterJoin(tables['train'], tables['items'], 'item_nbr', ['family', 'class', 'perishable'])
+    s3 = boto3.client('s3')
+    timestamp = datetime.datetime.now().isoformat()
+    sample = False
+    tables = load_data(s3, sample)
 
-    # Add stores.csv to big table on store_nbr, preserving all columns
-    print("Joining stores.csv to bigTable")
-    bigTable = leftOuterJoin(bigTable, tables['stores'], 'store_nbr', ['city', 'state', 'type', 'cluster'])
+    print("Joining data to train.csv to make bigTable")
+    join_tables_to_train_data(s3, tables, timestamp, sample)
 
-    # Add transactions to big table on store_nbr and date
-    print("Joining transactions.csv to bigTable")
-    bigTable = leftOuterJoin(bigTable, tables['transactions'], 'store_nbr', ['transactions'], extra_on_column='date')
-
-    # Add cities to big table on city and preserve all columns
-    print("Joining cities.csv to bigTable")
-    # bigTable = leftOuterJoin(bigTable, tables['cities'], 'city', [x for x in tables['cities'] if x != 'city'])
-
-    # Write data to parquet file:
-    print("Writing bigTable to file")
-    bigTable.write.csv('../data/v4/bigTable.csv')
+    print("Joining data to test.csv to make bigTable")
+    join_tables_to_test_data(s3, tables, timestamp, sample)
