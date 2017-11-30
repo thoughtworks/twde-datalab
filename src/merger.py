@@ -1,10 +1,7 @@
 import pandas as pd
 import datetime
-import os
-import s3fs
 from io import StringIO
 import boto3
-
 
 def load_data(s3, sample):
     s3bucket = "twde-datalab"
@@ -53,7 +50,7 @@ def join_tables_to_train_data(s3, tables, timestamp, sample, truncate=True):
     #    tables[table] = filter_for_latest_year(tables[table])
     filename += '2016-2017'
     filename += '.csv'
-    bigTable = add_tables(table)
+    bigTable = add_tables(table, tables)
     write_data_to_s3(s3, bigTable, filename, timestamp)
 
 
@@ -62,12 +59,12 @@ def join_tables_to_test_data(s3, tables, timestamp, sample):
         table = 'sample_test'
     else:
         table = 'test'
-    bigTable = add_tables(table)
+    bigTable = add_tables(table, tables)
     filename = 'bigTestTable.csv'
     write_data_to_s3(s3, bigTable, filename, timestamp)
 
 
-def add_tables(base_table):
+def add_tables(base_table, tables):
     print("Joining {}.csv and items.csv".format(base_table))
     bigTable = left_outer_join(tables[base_table], tables['items'], 'item_nbr')
 
@@ -83,22 +80,16 @@ def add_tables(base_table):
 
 
 def write_data_to_s3(s3, table, filename, timestamp):
-
     s3bucket = "twde-datalab"
 
-    aws_akid = os.environ['AWS_ID']
-    aws_seckey = os.environ['AWS_SECRET']
-    fs = s3fs.S3FileSystem(key=aws_akid, secret=aws_seckey)
-
-    key = "merger/{timestamp}".format(timestamp=timestamp)
-    s3path = "s3://{s3bucket}/{key}/".format(s3bucket=s3bucket, key=key)
-
-    print("writing {} data to {}".format(filename, s3path))
-    bytes_to_write = table.to_csv(None, index=False).encode()
-    with fs.open(s3path + filename, 'wb') as f:
-       f.write(bytes_to_write)
     s3.put_object(Body=timestamp, Bucket=s3bucket, Key='merger/latest')
 
+    key = "merger/{timestamp}".format(timestamp=timestamp)
+    print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
+
+    csv_buffer = StringIO()
+    table.to_csv(csv_buffer, index=False)
+    s3.put_object(Bucket=s3bucket, Key='{key}/{filename}'.format(key=key, filename=filename), Body=csv_buffer.getvalue())
 
 if __name__ == "__main__":
     s3 = boto3.client('s3')

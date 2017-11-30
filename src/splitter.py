@@ -1,7 +1,5 @@
 import pandas as pd
 import boto3
-import os
-import s3fs
 import datetime
 from io import StringIO
 import numpy as np
@@ -39,14 +37,13 @@ def move_random_items_from_train_to_validation(train, validation, num_items_to_r
 
 
 if __name__ == "__main__":
-    aws_akid = os.environ['AWS_ID']
-    aws_seckey = os.environ['AWS_SECRET']
     s3 = boto3.client('s3')
 
     s3bucket = "twde-datalab"
     dataset = "latest"
+    # dataset = "sample_data_path"
 
-    latestContents = s3.get_object(Bucket='twde-datalab', Key='merger/{}'.format(dataset))['Body']
+    latestContents = s3.get_object(Bucket=s3bucket, Key='merger/{}'.format(dataset))['Body']
     latest = latestContents.read().decode('utf-8').strip()
 
     s3bigTablePath = "merger/{latest}/bigTable2016-2017.csv".format(latest=latest)
@@ -64,23 +61,25 @@ if __name__ == "__main__":
     begin_of_validation, end_of_validation = get_validation_period(latest_date)
 
     print("Splitting data between {} and {}".format(begin_of_validation, end_of_validation))
-    train_train, train_validation = split_validation_train_by_validation_period(train, begin_of_validation, end_of_validation)
+    train_train, train_validation = split_validation_train_by_validation_period(train, begin_of_validation,
+                                                                                end_of_validation)
 
     timestamp = datetime.datetime.now().isoformat()
     s3.put_object(Body=timestamp, Bucket=s3bucket, Key='splitter/latest')
-    s3ValidationDataPath = "s3://twde-datalab/splitter/{}/".format(timestamp)
 
-    fs = s3fs.S3FileSystem(key=aws_akid, secret=aws_seckey)
+    key = "splitter/{}".format(timestamp)
+    filename = 'train.csv'
 
-    print("Writing train to {}train.csv".format(s3ValidationDataPath))
+    print("Writing train to {}/train.csv".format(key))
+    csv_buffer = StringIO()
+    train_train.to_csv(csv_buffer, index=False)
+    s3.put_object(Bucket=s3bucket, Key='{key}/{filename}'.format(key=key, filename=filename), Body=csv_buffer.getvalue())
 
-    bytes_to_write = train_train.to_csv(None, index=False).encode()
-    with fs.open(s3ValidationDataPath + 'train.csv', 'wb') as f:
-        f.write(bytes_to_write)
+    filename = 'test.csv'
+    print("Writing test to {}/test.csv".format(key))
 
-    print("Writing test to {}test.csv".format(s3ValidationDataPath))
+    csv_buffer = StringIO()
+    train_validation.to_csv(csv_buffer, index=False)
+    s3.put_object(Bucket=s3bucket, Key='{key}/{filename}'.format(key=key, filename=filename), Body=csv_buffer.getvalue())
 
-    bytes_to_write = train_validation.to_csv(None, index=False).encode()
-    with fs.open(s3ValidationDataPath + 'test.csv', 'wb') as f:
-        f.write(bytes_to_write)
     print("Done")
