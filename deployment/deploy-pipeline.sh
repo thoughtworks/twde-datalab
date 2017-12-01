@@ -11,7 +11,7 @@ do
 done
 
 if [ -z "$job" ] ; then
-    echo 'Usage: deploy_pipeline.sh -j <job name> [-n <pipeline name>]'
+    echo 'Usage: deploy_pipeline.sh -j <merger | splitter | decision_tree | all> [-n <pipeline name>]'
     exit 1
 fi
 
