@@ -79,7 +79,13 @@ def make_model(train):
 
 
 def overwrite_unseen_prediction_with_zero(preds, train, validate):
-    #TODO actually overwrite them
+    cols_item_store = ['item_nbr', 'store_nbr']
+    cols_to_use = validate.columns.drop('unit_sales') if 'unit_sales' in validate.columns else validate.columns
+    validate_train_joined = pd.merge(validate[cols_to_use], train, on=cols_item_store, how='left')
+    unseen = validate_train_joined[validate_train_joined['unit_sales'].isnull()]
+    validate['preds'] = preds
+    validate.loc[validate.id.isin(unseen['id_x']),'preds']=0
+    preds = validate['preds'].tolist()
     return preds
 
 
