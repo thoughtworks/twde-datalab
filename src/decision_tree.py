@@ -78,10 +78,16 @@ def make_model(train):
     return clf
 
 
-def make_predictions(clf, validate):
+def overwrite_unseen_prediction_with_zero(preds, train, validate):
+    #TODO actually overwrite them
+    return preds
+
+
+def make_predictions(clf, validate, train):
     print("Making prediction on validation data")
     validate_dropped = validate.drop('unit_sales', axis=1).fillna(-1)
     validate_preds = clf.predict(validate_dropped)
+    validate_preds = overwrite_unseen_prediction_with_zero(validate_preds, train, validate)
     return validate_preds
 
 
@@ -127,11 +133,11 @@ if __name__ == "__main__":
     original_train, original_validate, original_test = load_data(s3, s3bucket)
     train, validate, test = encode(original_train, original_validate, original_test)
     model = make_model(train)
-    validation_predictions = make_predictions(model, validate)
+    validation_predictions = make_predictions(model, validate, train)
 
     print("Calculating estimated error")
     validation_score = evaluation.nwrmsle(validation_predictions, validate['unit_sales'], validate['perishable'])
 
-    test_predictions = make_predictions(model, test)
+    test_predictions = make_predictions(model, test, train)
 
     write_predictions_and_score_to_s3(s3, s3bucket, test_predictions, validation_score, model, timestamp, original_test, original_train.columns)
