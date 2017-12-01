@@ -50,9 +50,10 @@ def join_tables_to_train_data(s3, tables, timestamp, sample, truncate=True):
     #    # Use only the latest year worth of data
     #    tables[table] = filter_for_latest_year(tables[table])
     filename += '2016-2017'
-    filename += '.csv'
+    filename += '.pkl'
     bigTable = add_tables(table, tables)
     write_data_to_s3(s3, bigTable, filename, timestamp, sample)
+
 
 def add_days_off(bigTable, tables):
     holidays = tables['holidays_events']
@@ -60,25 +61,26 @@ def add_days_off(bigTable, tables):
 
     # Isolating events that do not correspond to holidays
     # TODO use events? events=holidays.loc[holidays.type=='Event']
-    holidays=holidays.loc[holidays.type!='Event']
+    holidays = holidays.loc[holidays.type != 'Event']
 
     # Creating a categorical variable showing weekends
-    bigTable['dayoff']=[x in [6,7] for x in bigTable.dayofweek]
+    bigTable['dayoff'] = [x in [5, 6] for x in bigTable.dayofweek]
 
-    #TODO ignore transferred holidays
+    # TODO ignore transferred holidays
 
     # Adjusting this variable to show all holidays
-    for (d,t,l,n) in zip(holidays.date,holidays.type,holidays.locale,holidays.locale_name):
-        if t!='Work Day':
-            if l=='National':
-                bigTable.loc[bigTable.date==d,'dayoff']=True
-            elif l=='Regional':
-                bigTable.loc[(bigTable.date==d)&(bigTable.state==n),'dayoff']=True
+    for (d, t, l, n) in zip(holidays.date, holidays.type, holidays.locale, holidays.locale_name):
+        if t != 'Work Day':
+            if l == 'National':
+                bigTable.loc[bigTable.date == d, 'dayoff'] = True
+            elif l == 'Regional':
+                bigTable.loc[(bigTable.date == d) & (bigTable.state == n), 'dayoff'] = True
             else:
-                bigTable.loc[(bigTable.date==d)&(bigTable.city==n),'dayoff']=True
+                bigTable.loc[(bigTable.date == d) & (bigTable.city == n), 'dayoff'] = True
         else:
-            bigTable.loc[(bigTable.date==d),'dayoff']=False
+            bigTable.loc[(bigTable.date == d), 'dayoff'] = False
     return bigTable
+
 
 def join_tables_to_test_data(s3, tables, timestamp, sample):
     if sample:
@@ -86,7 +88,7 @@ def join_tables_to_test_data(s3, tables, timestamp, sample):
     else:
         table = 'test'
     bigTable = add_tables(table, tables)
-    filename = 'bigTestTable.csv'
+    filename = 'bigTestTable.pkl'
     write_data_to_s3(s3, bigTable, filename, timestamp, sample)
 
 
@@ -120,28 +122,36 @@ def add_tables(base_table, tables):
     bigTable = add_date_columns(bigTable)
 
     bigTable = add_days_off(bigTable, tables)
-    #TODO drop date? x.drop('date', axis=1)
+    # TODO drop date? x.drop('date', axis=1)
     return bigTable
 
 
 def write_data_to_s3(s3, table, filename, timestamp, sample=False):
     s3bucket = "twde-datalab"
     if not sample:
-        s3.put_object(Body=timestamp, Bucket=s3bucket, Key='merger/latest')
+        s3.Bucket(s3bucket).upload_file(timestamp, 'merger/latest')
 
     key = "merger/{timestamp}".format(timestamp=timestamp)
     print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
 
-    csv_buffer = StringIO()
-    table.to_csv(csv_buffer, index=False)
-    s3.put_object(Bucket=s3bucket, Key='{key}/{filename}'.format(key=key, filename=filename), Body=csv_buffer.getvalue())
+    table.to_pickle(filename)
+    s3.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
 
 if __name__ == "__main__":
-    s3 = boto3.client('s3')
-    timestamp = datetime.datetime.now().isoformat()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--sample", help="Use sample data? true | false", type=str)
+
     sample = False
-    tables = load_data(s3, sample)
+    args = parser.parse_args()
+    if args.sample == 'true':
+        sample = True
+
+    s3 = boto3.resource('s3')
+    s3client = boto3.client('s3')
+    timestamp = datetime.datetime.now().isoformat()
+    tables = load_data(s3client, sample)
 
     print("Joining data to train.csv to make bigTable")
     join_tables_to_train_data(s3, tables, timestamp, sample)

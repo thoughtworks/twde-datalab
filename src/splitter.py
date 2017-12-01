@@ -1,7 +1,6 @@
 import pandas as pd
 import boto3
 import datetime
-from io import StringIO
 import numpy as np
 
 
@@ -37,22 +36,35 @@ def move_random_items_from_train_to_validation(train, validation, num_items_to_r
 
 
 if __name__ == "__main__":
-    s3 = boto3.client('s3')
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--sample", help="Use sample data? true | false", type=str)
+
+    sample = False
+    args = parser.parse_args()
+    if args.sample == 'true':
+        sample = True
+
+    s3resource = boto3.resource('s3')
+    s3client = boto3.client('s3')
 
     s3bucket = "twde-datalab"
+
     dataset = "latest"
-    # dataset = "sample_data_path"
+    if sample:
+        dataset = "sample_data_path"
 
-    latestContents = s3.get_object(Bucket=s3bucket, Key='merger/{}'.format(dataset))['Body']
+    latestContents = s3client.get_object(Bucket=s3bucket, Key='merger/{}'.format(dataset))['Body']
     latest = latestContents.read().decode('utf-8').strip()
+    print("Latest folder: {}".format(latest))
+    print("Dataset value: {}".format(dataset))
 
-    s3bigTablePath = "merger/{latest}/bigTable2016-2017.csv".format(latest=latest)
+    s3bigTablePath = "merger/{latest}/bigTable2016-2017.pkl".format(latest=latest)
+    filename = 'bigTable2016-2017.pkl'
 
     print("Downloading latest bigTable from {}".format(s3bigTablePath))
-    obj = s3.get_object(Bucket=s3bucket, Key=s3bigTablePath)
-    body = obj['Body']
-    csv_string = body.read().decode('utf-8')
-    train = pd.read_csv(StringIO(csv_string))
+    s3resource.Bucket(s3bucket).download_file(s3bigTablePath, filename)
+    train = pd.read_pickle(filename)
 
     train['date'] = pd.to_datetime(train['date'], format="%Y-%m-%d")
 
@@ -65,21 +77,20 @@ if __name__ == "__main__":
                                                                                 end_of_validation)
 
     timestamp = datetime.datetime.now().isoformat()
-    s3.put_object(Body=timestamp, Bucket=s3bucket, Key='splitter/latest')
+    if not sample:
+        s3client.put_object(Body=timestamp, Bucket=s3bucket, Key='splitter/latest')
 
     key = "splitter/{}".format(timestamp)
-    filename = 'train.csv'
+    filename = 'train.pkl'
 
-    print("Writing train to {}/train.csv".format(key))
-    csv_buffer = StringIO()
-    train_train.to_csv(csv_buffer, index=False)
-    s3.put_object(Bucket=s3bucket, Key='{key}/{filename}'.format(key=key, filename=filename), Body=csv_buffer.getvalue())
+    print("Writing test to s3://{}/{}/{}".format(s3bucket, key, filename))
+    train_train.to_pickle(filename)
+    s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
-    filename = 'test.csv'
-    print("Writing test to {}/test.csv".format(key))
+    filename = 'test.pkl'
+    print("Writing test to s3://{}/{}/{}".format(s3bucket, key, filename))
 
-    csv_buffer = StringIO()
-    train_validation.to_csv(csv_buffer, index=False)
-    s3.put_object(Bucket=s3bucket, Key='{key}/{filename}'.format(key=key, filename=filename), Body=csv_buffer.getvalue())
+    train_validation.to_pickle(filename)
+    s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
     print("Done")
