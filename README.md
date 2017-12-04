@@ -21,6 +21,14 @@ We've been provided [4 years of purchasing history](https://www.kaggle.com/c/fav
 
 ## Infrastructure
 
+Our workflow is divided into several jobs, which can be deployed one after another automatically on Amazon Web Services. Let's look at Arif's amazing diagram to illustrate the workflow.
+
+![](https://user-images.githubusercontent.com/8107614/33561247-72463dd0-d912-11e7-8485-b40585da8434.png)
+
+
+
+
+
 ## Algorithms
 
 ## Next Steps
