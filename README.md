@@ -16,6 +16,9 @@ The purpose of this project is to help build a foundational knowledge pool aroun
 
 ## Data
 
+We've been provided [4 years of purchasing history](https://www.kaggle.com/c/favorita-grocery-sales-forecasting/data) in the competition itself. Our goal is to analyze this data, plus any other data we acquire (see the [external data discussion on kaggle](https://www.kaggle.com/c/favorita-grocery-sales-forecasting/discussion/41537)), and produce an estimated `unit sales` for each item in each store on each day for a two week period in 2017. 
+
+
 ## Infrastructure
 
 ## Algorithms
@@ -30,9 +33,3 @@ I recommend using anaconda to set up environment using environment.yml
 Yet, sometimes necessary latest version is not available. Then please use pip in addition. 
 for example,
 pip install notebook==5.1.0
-
-# Things to Consider:
-Random data about Ecuador: https://www.kaggle.com/headsortails/shopping-for-insights-favorita-eda#234333
-
-Official External Data Discussion: https://www.kaggle.com/c/favorita-grocery-sales-forecasting/discussion/41537
-
