@@ -4,7 +4,7 @@ from io import StringIO
 import boto3
 
 
-def load_data(s3, sample):
+def load_data(sample):
     s3bucket = "twde-datalab"
     # Load all tables from raw data
     tables = {}
@@ -20,7 +20,8 @@ def load_data(s3, sample):
         key = "raw/{table}.csv".format(table=t)
         print("Loading data from {}".format(key))
 
-        csv_string = s3.get_object(Bucket=s3bucket, Key=key)['Body'].read().decode('utf-8')
+        s3client = boto3.client('s3')
+        csv_string = s3client.get_object(Bucket=s3bucket, Key=key)['Body'].read().decode('utf-8')
         tables[t] = pd.read_csv(StringIO(csv_string))
     return tables
 
@@ -38,21 +39,17 @@ def filter_for_latest_year(train):
     return train[train['date'] > year_offset]
 
 
-def join_tables_to_train_data(s3, tables, timestamp, sample, truncate=True):
+def join_tables_to_train_data(tables, sample):
     filename = 'bigTable'
     if sample:
         table = 'sample_train'
     else:
         table = 'last_year_train'
 
-    # this is not necessary if we download truncated data
-    # if truncate:
-    #    # Use only the latest year worth of data
-    #    tables[table] = filter_for_latest_year(tables[table])
     filename += '2016-2017'
-    filename += '.pkl'
+    filename += '.hdf'
     bigTable = add_tables(table, tables)
-    write_data_to_s3(s3, bigTable, filename, timestamp, sample)
+    return bigTable, filename
 
 
 def add_days_off(bigTable, tables):
@@ -82,14 +79,14 @@ def add_days_off(bigTable, tables):
     return bigTable
 
 
-def join_tables_to_test_data(s3, tables, timestamp, sample):
+def join_tables_to_test_data(tables, sample):
     if sample:
         table = 'sample_test'
     else:
         table = 'test'
     bigTable = add_tables(table, tables)
-    filename = 'bigTestTable.pkl'
-    write_data_to_s3(s3, bigTable, filename, timestamp, sample)
+    filename = 'bigTestTable.hdf'
+    return bigTable, filename
 
 
 def add_date_columns(df):
@@ -119,23 +116,30 @@ def add_tables(base_table, tables):
     print("Joining cities.csv to bigTable")
     bigTable = left_outer_join(bigTable, tables['cities'], 'city')
 
+    print("Adding date columns")
     bigTable = add_date_columns(bigTable)
 
+    print("Adding days off")
     bigTable = add_days_off(bigTable, tables)
-    # TODO drop date? x.drop('date', axis=1)
+
+    # ### Can't drop date yet, because splitter.py needs it
+    # print("Dropping datetime column")
+    # bigTable = bigTable.drop('date', axis=1)
     return bigTable
 
 
-def write_data_to_s3(s3, table, filename, timestamp, sample=False):
+def write_data_to_s3(table, filename, timestamp, sample=False):
+    s3resource = boto3.resource('s3')
+    s3client = boto3.client('s3')
     s3bucket = "twde-datalab"
-    if not sample:
-        s3.Bucket(s3bucket).upload_file(timestamp, 'merger/latest')
+    print("Putting timestamp as latest file: {}".format(timestamp))
+    s3client.put_object(Body=timestamp, Bucket=s3bucket, Key='merger/latest')
 
     key = "merger/{timestamp}".format(timestamp=timestamp)
     print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
 
-    table.to_pickle(filename)
-    s3.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
+    table.to_hdf(filename, 'key_to_store', mode='w')
+    s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
 
 if __name__ == "__main__":
@@ -148,13 +152,13 @@ if __name__ == "__main__":
     if args.sample == 'true':
         sample = True
 
-    s3 = boto3.resource('s3')
-    s3client = boto3.client('s3')
     timestamp = datetime.datetime.now().isoformat()
-    tables = load_data(s3client, sample)
+    tables = load_data(sample)
 
     print("Joining data to train.csv to make bigTable")
-    join_tables_to_train_data(s3, tables, timestamp, sample)
+    bigTable, filename = join_tables_to_train_data(tables, sample)
+    write_data_to_s3(bigTable, filename, timestamp, sample)
 
     print("Joining data to test.csv to make bigTable")
-    join_tables_to_test_data(s3, tables, timestamp, sample)
+    bigTestTable, filename = join_tables_to_test_data(tables, sample)
+    write_data_to_s3(bigTable, filename, timestamp, sample)

@@ -2,54 +2,58 @@ import pandas as pd
 import datetime
 import sys
 import os
-import io
 import boto3
-import joblib
-from io import StringIO
+from sklearn.preprocessing import LabelEncoder
+from sklearn.externals import joblib
 sys.path.append(os.path.join('..', 'src'))
 sys.path.append(os.path.join('src'))
 from sklearn import tree
-import preprosessing_for_tree
 import evaluation
 
 
-def load_data(s3, s3bucket):
+def load_data(s3resource, s3client, s3bucket):
     # dataset = "sample_data_path"  # for running on a very small sample of data
     dataset = "latest"
-    latestContents = s3.get_object(Bucket='twde-datalab', Key='splitter/{}'.format(dataset))['Body']
+    latestContents = s3client.get_object(Bucket='twde-datalab', Key='splitter/{}'.format(dataset))['Body']
     latest = latestContents.read().decode('utf-8').strip()
 
-    trainPath = "splitter/{}/train.csv".format(latest)
-    print("Loading train data from {}".format(trainPath))
-    trainObj = s3.get_object(Bucket=s3bucket, Key=trainPath)
-    trainBody = trainObj['Body']
-    train_csv_string = trainBody.read().decode('utf-8')
-    train = pd.read_csv(StringIO(train_csv_string))
+    filename = 'train.hdf'
+    key = "splitter/{}/{}".format(latest, filename)
+    print("Loading {} data from {}".format(filename, key))
+    s3resource.Bucket(s3bucket).download_file(key, filename)
+    train = pd.read_hdf(filename)
 
-    validatePath = "splitter/{}/test.csv".format(latest)
-    print("Loading validate data from {}".format(validatePath))
-    validateObj = s3.get_object(Bucket=s3bucket, Key=validatePath)
-    validateBody = validateObj['Body']
-    validate_csv_string = validateBody.read().decode('utf-8')
-    validate = pd.read_csv(StringIO(validate_csv_string))
-
-    dataset = "latest"
-    latestContents = s3.get_object(Bucket='twde-datalab', Key='merger/{}'.format(dataset))['Body']
-    latest = latestContents.read().decode('utf-8').strip()
+    filename = 'test.hdf'
+    key = "splitter/{}/{}".format(latest, filename)
+    print("Loading {} data from {}".format(filename, key))
+    s3resource.Bucket(s3bucket).download_file(key, filename)
+    validate = pd.read_hdf(filename)
 
     print("Loading test data from raw/test.csv")
-    testPath = "merger/{}/bigTestTable.csv".format(latest)
-    testObj = s3.get_object(Bucket=s3bucket, Key=testPath)
-    testBody = testObj['Body']
-    test_csv_string = testBody.read().decode('utf-8')
-    test = pd.read_csv(StringIO(test_csv_string))
+    dataset = "latest"
+    latestContents = s3client.get_object(Bucket='twde-datalab', Key='merger/{}'.format(dataset))['Body']
+    latest = latestContents.read().decode('utf-8').strip()
+
+    filename = 'bigTestTable.hdf'
+    key = "merger/{}/{}".format(latest, filename)
+    print("Loading {} data from {}".format(filename, key))
+    s3resource.Bucket(s3bucket).download_file(key, filename)
+    test = pd.read_hdf(filename)
 
     return train, validate, test
 
 
 def join_tables(train, validate, test):
     print("Joining tables for consistent encoding")
-    return train.append(validate).append(test)
+    return train.append(validate).append(test).drop('date', axis=1)
+
+
+def encode_categorical_columns(df):
+    obj_df = df.select_dtypes(include=['object', 'bool']).copy().fillna('-1')
+    lb = LabelEncoder()
+    for col in obj_df.columns:
+        df[col] = lb.fit_transform(obj_df[col])
+    return df
 
 
 def encode(train, validate, test):
@@ -60,7 +64,7 @@ def encode(train, validate, test):
 
     joined = join_tables(train, validate, test)
 
-    encoded = preprosessing_for_tree.preprocess_for_trees(joined).fillna(-1)
+    encoded = encode_categorical_columns(joined.fillna(-1))
 
     validate = encoded[encoded['id'].isin(validate_ids)]
     train = encoded[encoded['id'].isin(train_ids)]
@@ -97,46 +101,58 @@ def make_predictions(clf, validate, train):
     return validate_preds
 
 
-def write_predictions_and_score_to_s3(s3, s3bucket, test_predictions, validation_score, model, timestamp, test, columns_used):
+def write_predictions_and_score_to_s3(s3resource, s3client, s3bucket, test_predictions, validation_score, model, timestamp, test, columns_used):
     key = "decision_tree/{timestamp}".format(timestamp=timestamp.isoformat())
 
-    s3.put_object(Body=timestamp.isoformat(), Bucket=s3bucket, Key='decision_tree/latest')
+    s3client.put_object(Body=timestamp.isoformat(), Bucket=s3bucket, Key='decision_tree/latest')
 
+    key = "decision_tree/{}".format(timestamp.isoformat())
     filename = 'submission.csv'
     print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
-    test_predictions = pd.DataFrame({'unit_sales': test_predictions})
-    predictions = test.join(test_predictions)[['id', 'unit_sales']]
-    predictions.loc[predictions['unit_sales'] < 0, 'unit_sales'] = 0
-    predictions['unit_sales'] = predictions['unit_sales'].round().astype(int)
+    print("predictions length: {}, test length: {}".format(len(test_predictions), test.count()))
+    test['unit_sales'] = test_predictions
+    # test_predictions = pd.DataFrame({'unit_sales': test_predictions})
+    # predictions = test.join(test_predictions)[['id', 'unit_sales']]
+    # predictions.loc[predictions['unit_sales'] < 0, 'unit_sales'] = 0
+    test['unit_sales'] = test['unit_sales'].round().astype(int)
+    test.to_csv(filename)
+    s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
-    csv_buffer = io.StringIO()
-    predictions.to_csv(csv_buffer, index=False)
-    s3.put_object(Bucket=s3bucket, Key='{key}/{filename}'.format(key=key, filename=filename), Body=csv_buffer.getvalue())
-
+    key = "decision_tree/{}".format(timestamp.isoformat())
     filename = 'model.pkl'
-    print("Writing model as pickle to s3://{}/{}/{}".format(s3bucket, key, filename))
-    joblib.dump(model, './model.pkl')
-    s3.put_object(Bucket=s3bucket, Key='{key}/'.format(key=key), Body='./model.pkl')
+    print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
+    joblib.dump(model, filename)
+    model.to_pickle(filename)
+    s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
+    key = "decision_tree/{}".format(timestamp.isoformat())
     filename = 'score_and_metadata.csv'
     print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
     timediff = (datetime.datetime.now() - timestamp).total_seconds() / 60
     score = pd.DataFrame({'runtime_minutes': [timediff], 'estimate': [validation_score], 'columns_used': [columns_used]})
-
-    csv_buffer = io.StringIO()
-    score.to_csv(csv_buffer, index=False)
-    s3.put_object(Bucket=s3bucket, Key='{key}/{filename}'.format(key=key, filename=filename), Body=csv_buffer.getvalue())
+    score.to_csv(filename)
+    s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
     print("Done. Time elapsed (minutes): {timediff}".format(timediff=timediff))
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--sample", help="Use sample data? true | false", type=str)
+
+    sample = False
+    args = parser.parse_args()
+    if args.sample == 'true':
+        sample = True
+
+    s3resource = boto3.resource('s3')
+    s3client = boto3.client('s3')
 
     timestamp = datetime.datetime.now()
     s3bucket = "twde-datalab"
-    s3 = boto3.client('s3')
 
-    original_train, original_validate, original_test = load_data(s3, s3bucket)
+    original_train, original_validate, original_test = load_data(s3resource, s3client, s3bucket)
     train, validate, test = encode(original_train, original_validate, original_test)
     model = make_model(train)
     validation_predictions = make_predictions(model, validate, train)
@@ -146,4 +162,4 @@ if __name__ == "__main__":
 
     test_predictions = make_predictions(model, test, train)
 
-    write_predictions_and_score_to_s3(s3, s3bucket, test_predictions, validation_score, model, timestamp, original_test, original_train.columns)
+    write_predictions_and_score_to_s3(s3resource, s3client, s3bucket, test_predictions, validation_score, model, timestamp, original_test, original_train.columns)

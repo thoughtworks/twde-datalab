@@ -59,12 +59,12 @@ if __name__ == "__main__":
     print("Latest folder: {}".format(latest))
     print("Dataset value: {}".format(dataset))
 
-    s3bigTablePath = "merger/{latest}/bigTable2016-2017.pkl".format(latest=latest)
-    filename = 'bigTable2016-2017.pkl'
+    s3bigTablePath = "merger/{latest}/bigTable2016-2017.hdf".format(latest=latest)
+    filename = 'bigTable2016-2017.hdf'
 
     print("Downloading latest bigTable from {}".format(s3bigTablePath))
     s3resource.Bucket(s3bucket).download_file(s3bigTablePath, filename)
-    train = pd.read_pickle(filename)
+    train = pd.read_hdf(filename)
 
     train['date'] = pd.to_datetime(train['date'], format="%Y-%m-%d")
 
@@ -81,16 +81,16 @@ if __name__ == "__main__":
         s3client.put_object(Body=timestamp, Bucket=s3bucket, Key='splitter/latest')
 
     key = "splitter/{}".format(timestamp)
-    filename = 'train.pkl'
+    filename = 'train.hdf'
 
     print("Writing test to s3://{}/{}/{}".format(s3bucket, key, filename))
-    train_train.to_pickle(filename)
+    train_train.to_hdf(filename, 'key_to_store', mode='w')
     s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
-    filename = 'test.pkl'
+    filename = 'test.hdf'
     print("Writing test to s3://{}/{}/{}".format(s3bucket, key, filename))
 
-    train_validation.to_pickle(filename)
+    train_validation.to_hdf(filename, 'key_to_store', mode='w')
     s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
     print("Done")
