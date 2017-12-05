@@ -29,16 +29,24 @@ Our workflow is divided into several jobs, which can be deployed one after anoth
 
 Our workflow is divided into several discrete steps, each downloading data from the latest output of the step before.
 
-### Step 1: Denormilization 
-Our first step is the denormalize our data. There are several reasons for this: 
+### Step 1: Denormilization (`src/merger.py`)
+Our first step is to denormalize our data. We do this for: 
   1. Consistent encoding of variables when we convert features from from `{True, False, NaN}` to `{0, 1, -1}` (or else we might end up with True mapping to 1 or 0 inconsistently)
-  2. Machine learning algorithms typically prefer one input matrix
+  2. Machine learning algorithms, which typically prefer one input matrix
 
-De-normalization happens in `src/merger.py`, which downloads any raw data files we've hard-coded it to download from `s3://twde-datalab/raw/` and uploads its (two file) output to `s3://twde-datalab/merger/<timestamp>/<
-{bigTable.hdf,bigTestTable.hdf}`
+`src/merger.py`:
+  - 1. downloads raw data from `s3://twde-datalab/raw/`
+  - 2. joins files together based on columns they have in common
+    - one dataset maps date + item sales to store numbers, a second dataset maps store numbers to city, and a third dataset maps city to weather information
+    - joining these data together, we can now associate the weather in the city on the day items were sold
+  - 3. adds columns to the DataFrame which are extracted out of the other columns
+    - for example, extrapolating from dates (`2015-08-10`) to  day of the week (Mon, Tues, ...)
+  - 4. uploads its (two file) output to `s3://twde-datalab/merger/<timestamp>/{bigTable.hdf,bigTestTable.hdf}`
+    - bigTable is the training for our machine learning algorithms
+    - bigTestTable is the test data we are to predict sales for, now enriched with data like weather and prices
 
-`merger.py` then goes on to do some more preprocessing by adding columns to the DataFrame which are extracted out of the other columns, for example turning a column with dates like `2015-08-10` to an extra column for day of the week (Mon, Tues, ...). 
-
+### Step 2: Validation Preparation (`src/splitter.py`)
+blah
 
 
 ## Algorithms
