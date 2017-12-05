@@ -3,6 +3,7 @@ This is the onboarding document for the TWDE Datalab. If you want to get involve
 
 
 ![](http://i0.kym-cdn.com/photos/images/original/001/268/288/04a.gif)
+###### (Pictured above: the android named Data, from Star Trek - The Next Generation)
 
 1. [Introduction](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#introduction)
 1. [Data](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#data)
