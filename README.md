@@ -33,7 +33,8 @@ Our first step is the denormalize our data. There are several reasons for this:
   1. Consistent encoding of variables when we convert features from from `{True, False, NaN}` to `{0, 1, -1}` (or else we might end up with True mapping to 1 or 0 inconsistently)
   2. Machine learning algorithms typically prefer one input matrix
 
-De-normalization happens in `src/merger.py`, which downloads any raw data files we've hard-coded it to download. Raw data files live in the `s3://twde-datalab/raw/`.
+De-normalization happens in `src/merger.py`, which downloads any raw data files we've hard-coded it to download from `s3://twde-datalab/raw/` and uploads its (two file) output to `s3://twde-datalab/merger/<timestamp>/<
+{bigTable.hdf,bigTestTable.hdf}`
 
 `merger.py` then goes on to do some more preprocessing by adding columns to the DataFrame which are extracted out of the other columns, for example turning a column with dates like `2015-08-10` to an extra column for day of the week (Mon, Tues, ...). 
 
