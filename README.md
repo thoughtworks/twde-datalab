@@ -1,7 +1,8 @@
 # TWDE-Datalab
-![](http://i0.kym-cdn.com/photos/images/original/001/268/288/04a.gif)
-
 This is the onboarding document for the TWDE Datalab. If you want to get involved, find something confusing, or just want to say hi, [please open an issue](https://github.com/emilyagras/kaggle-favorita/issues).
+
+
+![](http://i0.kym-cdn.com/photos/images/original/001/268/288/04a.gif)
 
 1. [Introduction](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#introduction)
 1. [Data](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#data)
