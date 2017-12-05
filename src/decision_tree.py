@@ -15,16 +15,16 @@ def load_data(s3resource, s3client, s3bucket):
     # dataset = "sample_data_path"  # for running on a very small sample of data
     dataset = "latest"
     latestContents = s3client.get_object(Bucket='twde-datalab', Key='splitter/{}'.format(dataset))['Body']
-    latest = latestContents.read().decode('utf-8').strip()
+    latestSplitter = latestContents.read().decode('utf-8').strip()
 
     filename = 'train.hdf'
-    key = "splitter/{}/{}".format(latest, filename)
+    key = "splitter/{}/{}".format(latestSplitter, filename)
     print("Loading {} data from {}".format(filename, key))
     s3resource.Bucket(s3bucket).download_file(key, filename)
     train = pd.read_hdf(filename)
 
     filename = 'test.hdf'
-    key = "splitter/{}/{}".format(latest, filename)
+    key = "splitter/{}/{}".format(latestSplitter, filename)
     print("Loading {} data from {}".format(filename, key))
     s3resource.Bucket(s3bucket).download_file(key, filename)
     validate = pd.read_hdf(filename)
@@ -32,10 +32,10 @@ def load_data(s3resource, s3client, s3bucket):
     print("Loading test data from raw/test.csv")
     dataset = "latest"
     latestContents = s3client.get_object(Bucket='twde-datalab', Key='merger/{}'.format(dataset))['Body']
-    latest = latestContents.read().decode('utf-8').strip()
+    latestMerger = latestContents.read().decode('utf-8').strip()
 
     filename = 'bigTestTable.hdf'
-    key = "merger/{}/{}".format(latest, filename)
+    key = "merger/{}/{}".format(latestMerger, filename)
     print("Loading {} data from {}".format(filename, key))
     s3resource.Bucket(s3bucket).download_file(key, filename)
     test = pd.read_hdf(filename)
@@ -88,7 +88,7 @@ def overwrite_unseen_prediction_with_zero(preds, train, validate):
     validate_train_joined = pd.merge(validate[cols_to_use], train, on=cols_item_store, how='left')
     unseen = validate_train_joined[validate_train_joined['unit_sales'].isnull()]
     validate['preds'] = preds
-    validate.loc[validate.id.isin(unseen['id_x']),'preds']=0
+    validate.loc[validate.id.isin(unseen['id_x']), 'preds'] = 0
     preds = validate['preds'].tolist()
     return preds
 

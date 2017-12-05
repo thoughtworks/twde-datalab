@@ -16,6 +16,7 @@ sudo python36 -m pip install numpy
 sudo python36 -m pip install joblib
 sudo python36 -m pip install sklearn
 sudo python36 -m pip install scipy
+sudo python36 -m pip install tables
 
 mkdir -p src && cd src
 aws s3 cp s3://twde-datalab/src.tar.gz .
