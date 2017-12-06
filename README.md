@@ -10,6 +10,7 @@ This is the onboarding document for the TWDE Datalab. If you want to get involve
 1. [Infrastructure](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#infrastructure)
 1. [Algorithms](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#algorithms)
 1. [Next Steps](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#next-steps)
+1. [Ways To Get Involved](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#ways-to-get-involved)
 1. [Getting Started](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#getting-started)
 
 
@@ -70,6 +71,16 @@ At the end of the day, we chose to start with a decision tree because it is rela
 
 
 ## Next Steps
+
+## Ways To Get Involved
+In the short time we had to start the TWDE-Datalab, we had to gloss over a lot of important parts of the science and engineering that are involved in a good data science project. There are many low hanging fruit ready to be picked by you, dear reader, if you want to get involved in the Data Science world at ThoughtWorks.
+
+### More Features
+### Better Data for Existing Features
+### Hyperparameterize the Existing Machine Learning Algorithms
+### Try Different Models
+### Use GridSearch to Compare Model Efficacy
+### Improve Validation Strategy 
 
 ## Getting Started
 
