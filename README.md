@@ -59,7 +59,7 @@ Consider the following the graphs; think of each trend line as a model of the da
 If we don't randomly withhold some of the data from ourselves and then evaluate our model against that withheld data, we will inevitably overfit the model and lose our general preditivity.
 
 ### Step 3: Machine Learning Models (`src/decision_tree.py`)
-blah 
+Step 3 of the pipeline is to supply data to a machine learning algorithm (or several) and made predictions on the data asked of us from `test.csv`, as provided by the kaggle competiton. See the [algorithms section](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#algorithms) below for more details on what we've implemented.
 
 ## Algorithms
 We implement one machine learning model for the time being, which creates a model based on the training data, rates its own accuracy using the validation data, and creates predictions, ready to be submit to kaggle.com from the `train.csv` file that was provided through the competiton.
