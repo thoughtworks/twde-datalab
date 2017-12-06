@@ -56,11 +56,18 @@ Consider the following the graphs; think of each trend line as a model of the da
   - **This is called overfitting.**
   - It's tempting to overfit a model because of how well it describes the data we already have, but it's much better to have a generally-right-but-never-perfectly-right model than a right-all-the-time-but-only-for-the-data-we-already-have model. 
 
+If we don't randomly withhold some of the data from ourselves and then evaluate our model against that withheld data, we will inevitably overfit the model and lose our general preditivity.
 
 ### Step 3: Machine Learning Models (`src/decision_tree.py`)
-blah
+blah 
 
 ## Algorithms
+We implement one machine learning model for the time being, which creates a model based on the training data, rates its own accuracy using the validation data, and creates predictions, ready to be submit to kaggle.com from the `train.csv` file that was provided through the competiton.
+
+Decision trees are one of the simplest algorithms to implement, which is why we've chosen it for our first approach. More complex variations of decision trees can be used to combate the downsides of decision trees, which maybe you, dear reader, would like to implement for us?
+
+At the end of the day, we chose to start with a decision tree because it is relatively light weight, it handles categorical and numerical data well, and it is robust against co-linearity, which our data has a lot of at the moment. 
+
 
 ## Next Steps
 
