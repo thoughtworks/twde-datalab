@@ -30,6 +30,7 @@ echo "Uploading run_pipeline_job.sh for $job"
 aws s3 cp run_pipeline_job.sh s3://twde-datalab/
 
 echo "Uploading src/ to twde-datalab/src.tar.gz"
+rm ../src/*.hdf
 tar czf src.tar.gz --directory="../src/" .
 aws s3 cp "src.tar.gz" "s3://twde-datalab/src.tar.gz"
 

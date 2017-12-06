@@ -116,25 +116,29 @@ def add_tables(base_table, tables):
     print("Joining cities.csv to bigTable")
     bigTable = left_outer_join(bigTable, tables['cities'], 'city')
 
-    print("Adding date columns")
-    bigTable = add_date_columns(bigTable)
-
-    print("Adding days off")
-    bigTable = add_days_off(bigTable, tables)
-
-    # ### Can't drop date yet, because splitter.py needs it
-    # print("Dropping datetime column")
-    # bigTable = bigTable.drop('date', axis=1)
     return bigTable
 
 
-def write_data_to_s3(table, filename, timestamp, sample=False):
+def add_percentage_transactions(bigTable):
+    bigTable['percent_in_transactions'] = bigTable.unit_sales / bigTable.transactions
+    return bigTable
+
+
+def add_transactions_per_capita(bigTable):
+    bigTable['transactions_per_capita'] = bigTable.transactions / bigTable.residents
+    return bigTable
+
+
+def write_data_to_s3(table, filename, timestamp, sample=''):
     s3resource = boto3.resource('s3')
     s3client = boto3.client('s3')
     s3bucket = "twde-datalab"
-    print("Putting timestamp as latest file: {}".format(timestamp))
-    s3client.put_object(Body=timestamp, Bucket=s3bucket, Key='merger/latest')
 
+    if not sample:
+        print("Putting timestamp as latest file: {}".format(timestamp))
+        s3client.put_object(Body=timestamp, Bucket=s3bucket, Key='merger/latest')
+    else:
+        timestamp = 'sample'
     key = "merger/{timestamp}".format(timestamp=timestamp)
     print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
 
@@ -142,23 +146,73 @@ def write_data_to_s3(table, filename, timestamp, sample=False):
     s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
 
+def add_sales_variance(bigTable):
+    """ Adds a new column reporting the variance
+    in unit_sales for each (item, store) tuple
+    """
+    df = bigTable.groupby(['store_nbr', 'item_nbr'])['unit_sales'].var().reset_index()
+    bigTable2 = bigTable.merge(df.rename(columns={'unit_sales': 'item_store_sales_variance'}), on=['store_nbr', 'item_nbr'])
+    return bigTable2
+
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--sample", help="Use sample data? true | false", type=str)
+    parser.add_argument("-u", "--upload", help="Upload finished file <true | false>", type=str)
 
     sample = False
+    upload = True
     args = parser.parse_args()
     if args.sample == 'true':
         sample = True
+    if args.upload == 'false':
+        upload = False
 
     timestamp = datetime.datetime.now().isoformat()
+    print("Started job at {}".format(timestamp))
     tables = load_data(sample)
 
     print("Joining data to train.csv to make bigTable")
-    bigTable, filename = join_tables_to_train_data(tables, sample)
-    write_data_to_s3(bigTable, filename, timestamp, sample)
+    bigTable, trainFilename = join_tables_to_train_data(tables, sample)
+
+    print("Adding date columns")
+    bigTable = add_date_columns(bigTable)
+
+    print("Adding days off")
+    bigTable = add_days_off(bigTable, tables)
+
+    print("Adding item sales per store transaction")
+    bigTable = add_percentage_transactions(bigTable)
+
+    print("Adding transactions per capita")
+    bigTable = add_transactions_per_capita(bigTable)
+
+    print("Calculating item-store sale variance")
+    bigTable = add_sales_variance(bigTable)
+
+    # ### Can't drop date yet, because splitter.py needs it
+    # print("Dropping datetime column")
+    # bigTable = bigTable.drop('date', axis=1)
 
     print("Joining data to test.csv to make bigTable")
-    bigTestTable, filename = join_tables_to_test_data(tables, sample)
-    write_data_to_s3(bigTable, filename, timestamp, sample)
+    bigTestTable, testFilename = join_tables_to_test_data(tables, sample)
+
+    print("Adding date columns")
+    bigTable = add_date_columns(bigTable)
+
+    print("Adding days off")
+    bigTable = add_days_off(bigTable, tables)
+
+    print("Adding transactions per capita")
+    bigTable = add_transactions_per_capita(bigTable)
+
+    # ### Can't drop date yet, because splitter.py needs it
+    # print("Dropping datetime column")
+    # bigTable = bigTable.drop('date', axis=1)
+    print(bigTable.head())
+    if upload:
+        write_data_to_s3(bigTable, trainFilename, timestamp, sample)
+        write_data_to_s3(bigTestTable, testFilename, timestamp, sample)
+    else:
+        print("Finished without uploading")

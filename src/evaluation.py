@@ -1,8 +1,12 @@
 import numpy as np
+import pandas as pd
 
 
 def nwrmsle(predictions, targets, weights):
-    predictions[predictions < 0] = np.nan
+    if type(predictions) == list:
+        predictions = [np.nan if x < 0 else x for x in predictions]
+    elif type(predictions) == pd.Series:
+        predictions[predictions < 0] = np.nan
     targets[targets < 0] = np.nan
     weights = 1 + 0.25 * weights
     log_square_errors = (np.log(predictions + 1) - np.log(targets + 1)) ** 2

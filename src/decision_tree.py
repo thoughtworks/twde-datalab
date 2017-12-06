@@ -29,7 +29,7 @@ def load_data(s3resource, s3client, s3bucket):
     s3resource.Bucket(s3bucket).download_file(key, filename)
     validate = pd.read_hdf(filename)
 
-    print("Loading test data from raw/test.csv")
+    print("Loading test data from merger/testBigTable.hdf")
     dataset = "latest"
     latestContents = s3client.get_object(Bucket='twde-datalab', Key='merger/{}'.format(dataset))['Body']
     latestMerger = latestContents.read().decode('utf-8').strip()
