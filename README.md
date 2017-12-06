@@ -48,11 +48,17 @@ Consider the following the graphs; think of each trend line as a model of the da
 
 ![image](https://user-images.githubusercontent.com/8107614/33661598-f91a92c6-da88-11e7-8a69-8c83fdf44ab1.png)
 
-The first model, a linear model on the left, fails to capture the convex shape of the data --- this is called underfitting.
-The third model, the polynomial trend line all the way on the right, describes the data we have perfectly, but it's unlikely to be accurate for data points further down the x axis, if it were ever provided new data. This is called overfitting.
+- The first model, a linear model on the left, fails to capture the convex shape of the data. It wont be predictive for new data points.
+  - **This is called underfitting.**
+- The second model captures the general trend of the data and is likely to continue generally describing the data even as new data points are provided. 
+  - **This model is neither underfit nor overfit, it's just right.**
+- The third model, the polynomial trend line all the way on the right, describes the data we have perfectly, but it's unlikely to be accurate for data points further down the x axis, if it were ever provided new data. 
+  - **This is called overfitting.**
+  - It's tempting to overfit a model because of how well it describes the data we already have, but it's much better to have a generally-right-but-never-perfectly-right model than a right-all-the-time-but-only-for-the-data-we-already-have model. 
 
-The second model, in the middle, captures the general trend of the data and is likely to continue generally describing the data even as new data points are provided. This model is neither underfit nor overfit, it's just right. It's tempting to overfit a model because of how well it describes the data we already have, but it's much better to have a generally-right-but-never-perfectly-right model than a right-all-the-time-but-only-for-the-data-we-already-have model. 
 
+### Step 3: Machine Learning Models (`src/decision_tree.py`)
+blah
 
 ## Algorithms
 
