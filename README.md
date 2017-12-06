@@ -23,14 +23,10 @@ We've been provided [4 years of purchasing history](https://www.kaggle.com/c/fav
 
 ## Infrastructure
 
-Our workflow is divided into several jobs, which can be deployed one after another automatically on Amazon Web Services. Let's look at Arif's amazing diagram to illustrate the workflow.
-
-![](https://user-images.githubusercontent.com/8107614/33561247-72463dd0-d912-11e7-8485-b40585da8434.png)
-
-Our workflow is divided into several discrete steps, each downloading data from the latest output of the step before.
+Our workflow is divided into several jobs, which can be deployed one after another automatically on Amazon Web Services; each job downloads data from the latest output of the step before.
 
 ### Step 1: Denormilization (`src/merger.py`)
-Our first step is to denormalize our data. We do this for: 
+We denormalize the data for: 
   1. Consistent encoding of variables when we convert features from from `{True, False, NaN}` to `{0, 1, -1}` (or else we might end up with True mapping to 1 or 0 inconsistently)
   2. Machine learning algorithms, which typically prefer one input matrix
 
@@ -46,7 +42,16 @@ Our first step is to denormalize our data. We do this for:
     - bigTestTable is the test data we are to predict sales for, now enriched with data like weather and prices
 
 ### Step 2: Validation Preparation (`src/splitter.py`)
-blah
+We split the data into training data and validation data each time we run the pipeline. Training data is used to make our model, and validation data is then compared to the model, as if we've been provided new data points. This prevents us from overfitting our model, and gives us a sanity check for whether we're improving the model or not.
+
+Consider the following the graphs; think of each trend line as a model of the data.
+
+![image](https://user-images.githubusercontent.com/8107614/33661598-f91a92c6-da88-11e7-8a69-8c83fdf44ab1.png)
+
+The first model, a linear model on the left, fails to capture the convex shape of the data --- this is called underfitting.
+The third model, the polynomial trend line all the way on the right, describes the data we have perfectly, but it's unlikely to be accurate for data points further down the x axis, if it were ever provided new data. This is called overfitting.
+
+The second model, in the middle, captures the general trend of the data and is likely to continue generally describing the data even as new data points are provided. This model is neither underfit nor overfit, it's just right. It's tempting to overfit a model because of how well it describes the data we already have, but it's much better to have a generally-right-but-never-perfectly-right model than a right-all-the-time-but-only-for-the-data-we-already-have model. 
 
 
 ## Algorithms
