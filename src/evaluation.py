@@ -4,7 +4,7 @@ import pandas as pd
 
 def nwrmsle(predictions, targets, weights):
     if type(predictions) == list:
-        predictions = [np.nan if x < 0 else x for x in predictions]
+        predictions = np.array([np.nan if x < 0 else x for x in predictions])
     elif type(predictions) == pd.Series:
         predictions[predictions < 0] = np.nan
     targets[targets < 0] = np.nan
