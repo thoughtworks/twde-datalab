@@ -35,7 +35,7 @@ createCluster () {
 sshWithKeypair() {
   echo "Connecting to cluster via ssh on port 8157"
   chmod 600 ~/keypair.pem
-  ssh -i ~/keypair.pem -ND 8157 hadoop@ec2-54-246-162-93.eu-west-1.compute.amazonaws.com
+  ssh -i ~/keypair.pem -ND 8157 hadoop@ec2-XX-XXX-XXX-XX.eu-west-1.compute.amazonaws.com
 }
 
 push_latest_bootstrap_actions(){

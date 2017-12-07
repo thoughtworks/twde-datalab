@@ -44,5 +44,4 @@ aws datapipeline put-pipeline-definition --pipeline-id $id --pipeline-definition
 echo "Activating pipeline"
 aws datapipeline activate-pipeline --pipeline-id $id
 
-#TODO sleep X
 #aws datapipeline deactivate-pipeline --pipeline-id $id --no-cancel-active
