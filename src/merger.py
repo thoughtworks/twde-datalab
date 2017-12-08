@@ -204,7 +204,7 @@ if __name__ == "__main__":
     bigTestTable = add_date_columns(bigTestTable)
 
     print("Joining cpi.csv to bigTable")
-    bigTestTable = left_outer_join(bigTable, tables['cpi'], ['year', 'month'])
+    bigTestTable = left_outer_join(bigTestTable, tables['cpi'], ['year', 'month'])
 
     print("Adding days off")
     bigTestTable = add_days_off(bigTestTable, tables)
