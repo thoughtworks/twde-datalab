@@ -85,6 +85,13 @@ In the short time we had to start the TWDE-Datalab, we had to gloss over a lot o
 The maintainers of the repository will be happy to help you get started.
 
 ## Getting Started
+This project expects python3 to be used.
+
+1. `git clone https://github.com/ThoughtWorksInc/twde-datalab && cd twde-datalab`
+~~1. `pip3 install -r requirements.txt`~~
+1. `python3 merger.py`
+1. `python3 splitter.py`
+1. `python3 decision_tree.py`
 
 # notes for setup
 I recommend using anaconda to set up environment using environment.yml
