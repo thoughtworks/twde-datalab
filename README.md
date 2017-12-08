@@ -88,7 +88,7 @@ The maintainers of the repository will be happy to help you get started.
 This project expects python3 to be used.
 
 1. `git clone https://github.com/ThoughtWorksInc/twde-datalab && cd twde-datalab`
-~~1. `pip3 install -r requirements.txt`~~
+1. `pip3 install -r requirements.txt`
 1. `python3 merger.py`
 1. `python3 splitter.py`
 1. `python3 decision_tree.py`
