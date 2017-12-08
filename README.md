@@ -1,17 +1,17 @@
 # TWDE-Datalab
-This is the onboarding document for the TWDE Datalab. If you want to get involved, find something confusing, or just want to say hi, [please open an issue](https://github.com/emilyagras/kaggle-favorita/issues).
+This is the onboarding document for the TWDE Datalab. If you want to get involved, find something confusing, or just want to say hi, [please open an issue](https://github.com/ThoughtWorksInc/twde-datalab/issues).
 
 
 ![](http://i0.kym-cdn.com/photos/images/original/001/268/288/04a.gif)
 ###### (Pictured above: the android named Data, from Star Trek - The Next Generation)
 
-1. [Introduction](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#introduction)
-1. [Data](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#data)
-1. [Infrastructure](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#infrastructure)
-1. [Algorithms](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#algorithms)
-1. [Next Steps](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#next-steps)
-1. [Ways To Get Involved](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#ways-to-get-involved)
-1. [Getting Started](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#getting-started)
+1. [Introduction](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#introduction)
+1. [Data](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#data)
+1. [Infrastructure](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#infrastructure)
+1. [Algorithms](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#algorithms)
+1. [Next Steps](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#next-steps)
+1. [Ways To Get Involved](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#ways-to-get-involved)
+1. [Getting Started](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#getting-started)
 
 
 ## Introduction
@@ -60,7 +60,7 @@ Consider the following graphs; think of each trend line as a model of the data.
 If we don't randomly withhold some of the data from ourselves and then evaluate our model against that withheld data, we will inevitably overfit the model and lose our general predictivity.
 
 ### Step 3: Machine Learning Models (`src/decision_tree.py`)
-Step 3 of the pipeline is to supply data to a machine learning algorithm (or several) and made predictions on the data asked of us from `test.csv`, as provided by the kaggle competition. See the [algorithms section](https://github.com/emilyagras/kaggle-favorita/blob/master/README.md#algorithms) below for more details on what we've implemented.
+Step 3 of the pipeline is to supply data to a machine learning algorithm (or several) and made predictions on the data asked of us from `test.csv`, as provided by the kaggle competition. See the [algorithms section](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#algorithms) below for more details on what we've implemented.
 
 ## Algorithms
 We implement one machine learning model for the time being, which creates a model based on the training data, rates its own accuracy using the validation data, and creates predictions, ready to be submitted to kaggle.com from the `train.csv` file that was provided through the competiton.
@@ -73,14 +73,16 @@ At the end of the day, we chose to start with a decision tree because it is rela
 ## Next Steps
 
 ## Ways To Get Involved
-In the short time we had to start the TWDE-Datalab, we had to gloss over a lot of important parts of the science and engineering that are involved in a good data science project. There are many low hanging fruit ready to be picked by you, dear reader, if you want to get involved in the Data Science world at ThoughtWorks.
-
-### More Features
-### Better Data for Existing Features
-### Hyperparameterize the Existing Machine Learning Algorithms
-### Try Different Models
-### Use GridSearch to Compare Model Efficacy
-### Improve Validation Strategy 
+In the short time we had to start the TWDE-Datalab, we had to gloss over a lot of important parts of the science and engineering that are involved in a good data science project. There are many low hanging fruit ready to be picked by you, dear reader, if you want to get involved in the Data Science world at ThoughtWorks. You should look to the [issues](https://github.com/ThoughtWorksInc/twde-datalab/issues) on this repository for specifics or to ask for guidance, but generally some of the next steps include:
+  - More Features
+  - Better Data for Existing Features
+  - Hyperparameterize the Existing Machine Learning Algorithms
+  - Try Different Models
+  - Use GridSearch to Compare Model Efficacy
+  - Improve Validation Strategy 
+  - Improving the pipeline setup
+  
+The maintainers of the repository will be happy to help you get started.
 
 ## Getting Started
 
