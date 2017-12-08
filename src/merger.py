@@ -203,7 +203,7 @@ if __name__ == "__main__":
     print("Adding date columns")
     bigTestTable = add_date_columns(bigTestTable)
 
-    print("Joining cpi.csv to bigTable")
+    print("Joining cpi.csv to bigTestTable")
     bigTestTable = left_outer_join(bigTestTable, tables['cpi'], ['year', 'month'])
 
     print("Adding days off")
@@ -211,6 +211,14 @@ if __name__ == "__main__":
 
     print("Adding transactions per capita")
     bigTestTable = add_transactions_per_capita(bigTestTable)
+
+    print("Adding NaNs for item-store sale variance")
+    print("Adding NaNs for item sales per store transaction")
+    print("Adding NaNs for unit_sales")
+    bigTestTable = bigTestTable.join(pd.DataFrame({
+        'item_store_sales_variance': [],
+        'percent_in_transactions': [],
+        'unit_sales': []}))
 
     print(bigTable.head())
     if upload:
