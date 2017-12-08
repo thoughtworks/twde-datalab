@@ -4,19 +4,17 @@ from io import StringIO
 import boto3
 
 
-def load_data(dataset):
+def load_data(sample):
     s3bucket = "twde-datalab"
     # Load all tables from raw data
     tables = {}
     tables_to_download = ['stores', 'items', 'transactions', 'cities', 'holidays_events', 'cpi']
-    if dataset == 'sample':
-        test_file = 'sample_test'
-        dataset = 'sample_train'
+    if sample:
+        tables_to_download.append('sample_train')
+        tables_to_download.append('sample_test')
     else:
-        test_file = 'test'
-
-    tables_to_download.append(dataset)
-    tables_to_download.append(test_file)
+        tables_to_download.append('train30days')
+        tables_to_download.append('test')
 
     for t in tables_to_download:
         key = "raw/{table}.csv".format(table=t)
@@ -160,24 +158,20 @@ def add_sales_variance(bigTable):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    # parser.add_argument("-s", "--sample", help="Use sample data? true | false", type=str)
+    parser.add_argument("-s", "--sample", help="Use sample data? true | false", type=str)
     parser.add_argument("-u", "--upload", help="Upload finished file <true | false>", type=str)
-    parser.add_argument("-d", "--dataset", help="Which raw/training data to use <train | train30days | last_year_train | sample>", type=str)
 
     sample = False
     upload = True
-    dataset = 'train30days'
     args = parser.parse_args()
+    if args.sample == 'true':
+        sample = True
     if args.upload == 'false':
         upload = False
-    if args.dataset:
-        dataset = args.dataset
-    if args.dataset == 'sample':
-        sample = True
 
     timestamp = datetime.datetime.now().isoformat()
     print("Started job at {}".format(timestamp))
-    tables = load_data(dataset)
+    tables = load_data(sample)
 
     print("Joining data to train.csv to make bigTable")
     bigTable, trainFilename = join_tables_to_train_data(tables, sample)
