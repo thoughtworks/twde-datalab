@@ -109,20 +109,17 @@ def write_predictions_and_score_to_s3(s3resource, s3client, s3bucket, test_predi
     key = "decision_tree/{}".format(timestamp.isoformat())
     filename = 'submission.csv'
     print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
-    print("predictions length: {}, test length: {}".format(len(test_predictions), test.count()))
     test['unit_sales'] = test_predictions
-    # test_predictions = pd.DataFrame({'unit_sales': test_predictions})
-    # predictions = test.join(test_predictions)[['id', 'unit_sales']]
-    # predictions.loc[predictions['unit_sales'] < 0, 'unit_sales'] = 0
-    test['unit_sales'] = test['unit_sales'].round().astype(int)
-    test.to_csv(filename)
+    predictions = test[['id', 'unit_sales']]
+    predictions.loc[predictions['unit_sales'] < 0, 'unit_sales'] = 0
+    predictions['unit_sales'] = predictions['unit_sales'].round().astype(int)
+    predictions.to_csv(filename, index=False)
     s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
     key = "decision_tree/{}".format(timestamp.isoformat())
     filename = 'model.pkl'
     print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
     joblib.dump(model, filename)
-    model.to_pickle(filename)
     s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
     key = "decision_tree/{}".format(timestamp.isoformat())
@@ -130,7 +127,7 @@ def write_predictions_and_score_to_s3(s3resource, s3client, s3bucket, test_predi
     print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
     timediff = (datetime.datetime.now() - timestamp).total_seconds() / 60
     score = pd.DataFrame({'runtime_minutes': [timediff], 'estimate': [validation_score], 'columns_used': [columns_used]})
-    score.to_csv(filename)
+    score.to_csv(filename, index=False)
     s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
     print("Done. Time elapsed (minutes): {timediff}".format(timediff=timediff))

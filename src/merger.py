@@ -8,12 +8,12 @@ def load_data(sample):
     s3bucket = "twde-datalab"
     # Load all tables from raw data
     tables = {}
-    tables_to_download = ['stores', 'items', 'transactions', 'cities', 'holidays_events']
+    tables_to_download = ['stores', 'items', 'transactions', 'cities', 'holidays_events', 'cpi']
     if sample:
         tables_to_download.append('sample_train')
         tables_to_download.append('sample_test')
     else:
-        tables_to_download.append('last_year_train')
+        tables_to_download.append('train30days')
         tables_to_download.append('test')
 
     for t in tables_to_download:
@@ -44,9 +44,9 @@ def join_tables_to_train_data(tables, sample):
     if sample:
         table = 'sample_train'
     else:
-        table = 'last_year_train'
+        table = 'train30days'
 
-    filename += '2016-2017'
+    filename += '30days'
     filename += '.hdf'
     bigTable = add_tables(table, tables)
     return bigTable, filename
@@ -179,6 +179,9 @@ if __name__ == "__main__":
     print("Adding date columns")
     bigTable = add_date_columns(bigTable)
 
+    print("Joining cpi.csv to bigTable")
+    bigTable = left_outer_join(bigTable, tables['cpi'], ['year', 'month'])
+
     print("Adding days off")
     bigTable = add_days_off(bigTable, tables)
 
@@ -191,25 +194,24 @@ if __name__ == "__main__":
     print("Calculating item-store sale variance")
     bigTable = add_sales_variance(bigTable)
 
-    # ### Can't drop date yet, because splitter.py needs it
-    # print("Dropping datetime column")
-    # bigTable = bigTable.drop('date', axis=1)
-
-    print("Joining data to test.csv to make bigTable")
+    # Make test.csv have the same features as bigTable
+    # TODO: Make this less spaghetti code by doing both
+    # merges at the same time
+    print("Joining data to test.csv to make bigTestTable")
     bigTestTable, testFilename = join_tables_to_test_data(tables, sample)
 
     print("Adding date columns")
-    bigTable = add_date_columns(bigTable)
+    bigTestTable = add_date_columns(bigTestTable)
+
+    print("Joining cpi.csv to bigTable")
+    bigTestTable = left_outer_join(bigTable, tables['cpi'], ['year', 'month'])
 
     print("Adding days off")
-    bigTable = add_days_off(bigTable, tables)
+    bigTestTable = add_days_off(bigTestTable, tables)
 
     print("Adding transactions per capita")
-    bigTable = add_transactions_per_capita(bigTable)
+    bigTestTable = add_transactions_per_capita(bigTestTable)
 
-    # ### Can't drop date yet, because splitter.py needs it
-    # print("Dropping datetime column")
-    # bigTable = bigTable.drop('date', axis=1)
     print(bigTable.head())
     if upload:
         write_data_to_s3(bigTable, trainFilename, timestamp, sample)

@@ -20,7 +20,9 @@ cp run_pipeline.sh run_pipeline_job.sh
 
 if [ "$job" = "all" ]; then
 	echo "python36 merger.py" >> run_pipeline_job.sh
+	echo "rm *.hdf" >> run_pipeline_job.sh
 	echo "python36 splitter.py" >> run_pipeline_job.sh
+	echo "rm *.hdf" >> run_pipeline_job.sh
 	echo "python36 decision_tree.py" >> run_pipeline_job.sh
 else 
   echo "python36 $job.py" >> run_pipeline_job.sh
@@ -30,7 +32,7 @@ echo "Uploading run_pipeline_job.sh for $job"
 aws s3 cp run_pipeline_job.sh s3://twde-datalab/
 
 echo "Uploading src/ to twde-datalab/src.tar.gz"
-rm ../src/*.hdf
+rm ../src/*.hdf ../src/*.csv
 tar czf src.tar.gz --directory="../src/" .
 aws s3 cp "src.tar.gz" "s3://twde-datalab/src.tar.gz"
 
