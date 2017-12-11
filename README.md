@@ -93,6 +93,16 @@ This project expects python3 to be used.
 1. `python3 splitter.py`
 1. `python3 decision_tree.py`
 
+After the long wait for each file to compute, the output data will be uploaded to the latest folder on S3. 
+- `/merger/<latest timestamp>/bigTable2016-2017.hdf`
+- `/merger/<latest timestamp>/bigTestTable.hdf`
+- `/splitter/<latest timestamp>/train.hdf`
+- `/splitter/<latest timestamp>/test.hdf`
+- `/decision_tree/<latest timestamp>/submission.hdf`
+- `/decision_tree/<latest timestamp>/model.pkl`
+- `/decision_tree/<latest timestamp>/score_and_metadata.csv`
+where each `<latest timestamp>` can be found in each directory's `latest` file. (i.e. `merger/latest`, `splitter/latest`, and `decision_tree/latest`)
+
 We have also been exploring different ways to deploy the code on AWS. Our first approach was through creating Elastic Map Reduce clusters, but since we haven't been doing distributed computing very much, we're using AWS Data Pipeline. You can deploy a job or multiple jobs as a Data Pipeline from the `deployment` directory, using `sh deploy-pipeline -j JOB [-n PIPELINE_NAME]`. Get in touch with us if you'd like to be given access via AWS IAM.
 
 # notes for setup
