@@ -93,6 +93,8 @@ This project expects python3 to be used.
 1. `python3 splitter.py`
 1. `python3 decision_tree.py`
 
+We have also been exploring different ways to deploy the code on AWS. Our first approach was through creating Elastic Map Reduce clusters, but since we haven't been doing distributed computing very much, we're using AWS Data Pipeline. You can deploy a job or multiple jobs as a Data Pipeline from the `deployment` directory, using `sh deploy-pipeline -j JOB [-n PIPELINE_NAME]`. Get in touch with us if you'd like to be given access via AWS IAM.
+
 # notes for setup
 I recommend using anaconda to set up environment using environment.yml
 
