@@ -13,7 +13,7 @@ def load_data(sample):
         tables_to_download.append('sample_train')
         tables_to_download.append('sample_test')
     else:
-        tables_to_download.append('train30days')
+        tables_to_download.append('last_year_train')
         tables_to_download.append('test')
 
     for t in tables_to_download:
@@ -44,9 +44,9 @@ def join_tables_to_train_data(tables, sample):
     if sample:
         table = 'sample_train'
     else:
-        table = 'train30days'
+        table = 'last_year_train'
 
-    filename += '30days'
+    filename += '2016-2017'
     filename += '.hdf'
     bigTable = add_tables(table, tables)
     return bigTable, filename

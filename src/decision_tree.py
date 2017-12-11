@@ -97,7 +97,7 @@ def make_predictions(clf, validate, train):
     print("Making prediction on validation data")
     validate_dropped = validate.drop('unit_sales', axis=1).fillna(-1)
     validate_preds = clf.predict(validate_dropped)
-    validate_preds = overwrite_unseen_prediction_with_zero(validate_preds, train, validate)
+    # validate_preds = overwrite_unseen_prediction_with_zero(validate_preds, train, validate)
     return validate_preds
 
 

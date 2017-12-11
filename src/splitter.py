@@ -59,8 +59,8 @@ if __name__ == "__main__":
     print("Latest folder: {}".format(latest))
     print("Dataset value: {}".format(dataset))
 
-    s3bigTablePath = "merger/{latest}/bigTable30days.hdf".format(latest=latest)
-    filename = 'bigTable30days.hdf'
+    s3bigTablePath = "merger/{latest}/bigTable2016-2017.hdf".format(latest=latest)
+    filename = 'bigTable2016-2017.hdf'
 
     print("Downloading latest bigTable from {}".format(s3bigTablePath))
     s3resource.Bucket(s3bucket).download_file(s3bigTablePath, filename)
