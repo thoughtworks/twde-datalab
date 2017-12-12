@@ -1,1 +1,0 @@
-aws emr add-steps --cluster-id j-YH5JJ1MNV7SM --steps Type=spark,Name=AsClient,Args=[--deploy-mode,cluster,--master,yarn,--conf,spark.yarn.submit.waitAppCompletion=true,"s3://twde-datalab/test_pyspark_step.py"],ActionOnFailure=CONTINUE

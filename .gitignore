@@ -2,3 +2,4 @@ data/*.csv
 test/__pycache__/
 *.pyc
 **/.cache/*
+.idea
