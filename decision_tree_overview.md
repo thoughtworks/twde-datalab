@@ -8,9 +8,9 @@ Our workflow is divided into several jobs, which can be run one after another au
 
 
 ### Step 1: Denormalization (`src/merger.py`)
-We denormalize the data because machine learning algorithms, which typically prefer one input matrix. Denormalization turns n > 1 tables into 1 table, with redundant features.
+We denormalize the data because machine learning algorithms typically prefer one input matrix. Denormalization turns n > 1 tables into 1 table. This one table is not typically how you'd like to store data in a database -- we're undoing the entire benefit gained from relational databases. 
 
-We can have a table called sales, and a table called stores, which we combine into a table which communicates the same data but less efficiently. 
+Suppose there is a table called sales and a table called stores, which we combine into a table which communicates the same data but less efficiently. 
 #### Sales:
 
 |Transaction Id| Item | Store Name |
@@ -34,11 +34,10 @@ We can have a table called sales, and a table called stores, which we combine in
 |2|Cabbage|Erich-Fromm Platz Store|Frankfurt|
 |3|Carrots|Zimmerstrasse Store|Berlin|
 
-Now we have a table that's ready be analyzed.
-
+Now we have a table that's ready be analyzed. So.
 
 `src/merger.py`:
-1. downloads raw data from `s3://twde-datalab/raw/` or loads it from a local location
+1. downloads raw data from `s3://twde-datalab/raw/` or loads it from your local harddrive
 2. joins files together based on columns they have in common
 3. adds columns to the DataFrame which are extracted out of the other columns
     - extrapolating from dates (`2015-08-10`) to  day of the week (Mon, Tues, ...)
@@ -64,4 +63,4 @@ Consider the following graphs; think of each trend line as a model of the data.
 If we don't randomly withhold some of the data from ourselves and then evaluate our model against that withheld data, we will inevitably overfit the model and lose our general predictivity.
 
 ### Step 3: Machine Learning Models (`src/decision_tree.py`)
-Step 3 of the pipeline is to supply data to a machine learning algorithm (or several) and made predictions on the data asked of us from `test.csv`, as provided by the kaggle competition. See the [algorithms section](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#algorithms) below for more details on what we've implemented.
+Step 3 of the pipeline is to supply data to a machine learning algorithm (or several) and make predictions by generalizing the data with a model. We provide our decision tree with the `train` data from `splitter`, and the algorithm learns to map different values of the various column in the data to the `unit_sales` column. This mapping is the model. Then we use the model to make predictions on the `validation` data that `splitter` created for us, and see how well the model performed.
