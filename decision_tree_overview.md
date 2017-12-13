@@ -1,7 +1,11 @@
 Decision Tree Workflow
 -----------------
 
-Our workflow is divided into several jobs, which can be deployed one after another automatically on Amazon Web Services; each job uses data from the latest output of the step before.
+Our workflow is divided into several jobs, which can be run one after another automatically; each job uses data from the latest output of the step before. The workflow looks like this: 
+<img src="https://user-images.githubusercontent.com/8107614/33561247-72463dd0-d912-11e7-8485-b40585da8434.png" width="500" height="500">
+
+
+
 
 ### Step 1: Denormalization (`src/merger.py`)
 We denormalize the data because machine learning algorithms, which typically prefer one input matrix. Denormalization turns n > 1 tables into 1 table, with redundant features.
@@ -11,37 +15,36 @@ We can have a table called sales, and a table called stores, which we combine in
 
 |Transaction Id| Item | Store Name |
 |-|-|-|
-|1|Cheese|Zimmerstrasse|
-|2|Cabbage|Erich-Fromm Platz|
-|3|Carrots|Zimmerstrasse|
+|1|Cheese|Zimmerstrasse Store|
+|2|Cabbage|Erich-Fromm Platz Store|
+|3|Carrots|Zimmerstrasse Store|
 
 #### Stores
 
 | Store Name | City|
 |-|-|
-|Erich-Fromm Platz|Frankfurt|
-|Zimmerstrasse|Berlin|
+|Erich-Fromm Platz Store|Frankfurt|
+|Zimmerstrasse Store|Berlin|
 
 #### De-normalized
 
 |Transaction Id| Item | Store Name | City |
 |-|-|-|-|
-|1|Cheese|Zimmerstrasse|Berlin|
-|2|Cabbage|Erich-Fromm Platz|Frankfurt|
-|3|Carrots|Zimmerstrasse|Berlin|
+|1|Cheese|Zimmerstrasse Store|Berlin|
+|2|Cabbage|Erich-Fromm Platz Store|Frankfurt|
+|3|Carrots|Zimmerstrasse Store|Berlin|
 
+Now we have a table that's ready be analyzed.
 
 
 `src/merger.py`:
-1. downloads raw data from `s3://twde-datalab/raw/`
+1. downloads raw data from `s3://twde-datalab/raw/` or loads it from a local location
 2. joins files together based on columns they have in common
-    - one dataset maps date + item sales to store numbers, a second dataset maps store numbers to city, and a third dataset maps city to weather information
-    - joining these data together, we can now associate the weather in the city on the day items were sold
 3. adds columns to the DataFrame which are extracted out of the other columns
-    - for example, extrapolating from dates (`2015-08-10`) to  day of the week (Mon, Tues, ...)
-4. uploads its (two file) output to `s3://twde-datalab/merger/<timestamp>/{bigTable.hdf,bigTestTable.hdf}`
-    - bigTable is the training for our machine learning algorithms
-    - bigTestTable is the test data we are to predict sales for, now enriched with data like weather and prices
+    - extrapolating from dates (`2015-08-10`) to  day of the week (Mon, Tues, ...)
+    - extrapolating from `date` and `city` information to get the city's population at the time, and whether it rained that day
+4. saves its output to `merger/bigTable.csv`
+
 
 ### Step 2: Validation Preparation (`src/splitter.py`)
 We split the data into training data and validation data each time we run the pipeline. Training data is used to make our model, and validation data is then compared to the model, as if we've been provided new data points. This prevents us from overfitting our model, and gives us a sanity check for whether we're improving the model or not.
@@ -62,8 +65,3 @@ If we don't randomly withhold some of the data from ourselves and then evaluate 
 
 ### Step 3: Machine Learning Models (`src/decision_tree.py`)
 Step 3 of the pipeline is to supply data to a machine learning algorithm (or several) and made predictions on the data asked of us from `test.csv`, as provided by the kaggle competition. See the [algorithms section](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#algorithms) below for more details on what we've implemented.
-
-
-<img src="https://user-images.githubusercontent.com/8107614/33561247-72463dd0-d912-11e7-8485-b40585da8434.png" width="500" height="500">
-
-
