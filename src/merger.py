@@ -9,13 +9,18 @@ def load_data():
     tables = {}
     tables_to_download = ['quito_stores_sample2016-2017', 'items', 'transactions', 'holidays_events', 'cpi']
 
+    if not os.path.exists('./raw'):
+        os.makedirs('./raw')
+
     for t in tables_to_download:
         key = "raw/{table}.csv".format(table=t)
-        print("Loading data from {}".format(key))
 
-        s3client = boto3.client('s3')
-        csv_string = s3client.get_object(Bucket=s3bucket, Key=key)['Body'].read().decode('utf-8')
-        tables[t] = pd.read_csv(StringIO(csv_string))
+        if not os.path.exists(key):
+            print("Downloading data from {}".format(key))
+            s3resource = boto3.resource('s3')
+            s3resource.Bucket(s3bucket).download_file(Key=key, Filename=key)
+
+        tables[t] = pd.read_csv(key)
     return tables
 
 
