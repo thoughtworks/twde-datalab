@@ -12,7 +12,7 @@ As you approach a data problem, you should try to identify your hypotheses and y
 
 At this point, you might not know how many stores you're trying to predict sales for. Do you know how many items the stores sell? What is the date range of the data provided?
 
-Let's do some of the most [basic exploratory analysis in a Jupyter Notebook]() 
+Let's do some of the most [basic exploratory analysis in a Jupyter Notebook](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/analysis/Exploratory_Analysis.ipynb) 
 
 
 
