@@ -103,3 +103,5 @@ if __name__ == "__main__":
     validation_score = evaluation.nwrmsle(validation_predictions, validate['unit_sales'], validate['perishable'])
 
     write_predictions_and_score(validation_score, model, original_train.columns)
+
+    print("Decision tree analysis done with a validation score (error rate) of {}.".format(validation_score))

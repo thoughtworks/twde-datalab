@@ -1,10 +1,9 @@
 import pandas as pd
-from io import StringIO
-import boto3
 import os
+import s3fs
 
 def load_data():
-    s3bucket = "twde-datalab"
+    s3bucket = "twde-datalab/"
     # Load all tables from raw data
     tables = {}
     tables_to_download = ['quito_stores_sample2016-2017', 'items', 'transactions', 'holidays_events', 'cpi']
@@ -17,8 +16,8 @@ def load_data():
 
         if not os.path.exists(key):
             print("Downloading data from {}".format(key))
-            s3resource = boto3.resource('s3')
-            s3resource.Bucket(s3bucket).download_file(Key=key, Filename=key)
+            s3 = s3fs.S3FileSystem(anon=True)
+            s3.get(s3bucket + key, key)
 
         tables[t] = pd.read_csv(key)
     return tables
