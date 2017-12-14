@@ -1,20 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
-
-
-def get_validation_period(latest_date_train):
-    # we want from wednesday to thursday (encoded as int 3) for a 15 day period
-    offset = (latest_date_train.weekday() - 3) % 7
-    end_of_validation_period = latest_date_train - pd.DateOffset(days=offset)
-    begin_of_validation_period = end_of_validation_period - pd.DateOffset(days=15)
-    return (begin_of_validation_period, end_of_validation_period)
-
-
-def split_validation_train_by_validation_period(train, validation_begin_date, validation_end_date):
-    train_validation = train[(train['date'] >= validation_begin_date) & (train['date'] <= validation_end_date)]
-    train_train = train[train['date'] < validation_begin_date]
-    return train_train, train_validation
+from sklearn.model_selection import train_test_split
 
 
 def move_items_from_train_to_validation(train, validation, items_to_remove):
@@ -33,6 +20,7 @@ def move_random_items_from_train_to_validation(train, validation, num_items_to_r
     print("validation data: {} -> {} rows".format(validation.shape[0], validation2.shape[0]))
     return train2, validation2
 
+
 def write_data(table, filename):
     if not os.path.exists('./splitter'):
         os.makedirs('./splitter')
@@ -40,21 +28,23 @@ def write_data(table, filename):
     print("Writing to ./splitter/{}".format(filename))
     table.to_csv('splitter/' + filename, index=False)
 
-if __name__ == "__main__":
+
+def main():
     print("Loading data from merger output")
     train = pd.read_csv("./merger/bigTable.csv")
 
     train['date'] = pd.to_datetime(train['date'], format="%Y-%m-%d")
 
-    latest_date = train['date'].max()
+    print("Splitting data 70:30 train:validation")
 
-    begin_of_validation, end_of_validation = get_validation_period(latest_date)
+    train_train, train_validation = train_test_split(train, test_size=0.3)
 
-    print("Splitting data between {} and {}".format(begin_of_validation, end_of_validation))
-    train_train, train_validation = split_validation_train_by_validation_period(train, begin_of_validation,
-                                                                                end_of_validation)
     write_data(train_train, 'train.csv')
 
     write_data(train_validation, 'validation.csv')
 
     print("Finished splitting")
+
+
+if __name__ == "__main__":
+    main()

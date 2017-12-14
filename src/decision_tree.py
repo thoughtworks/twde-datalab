@@ -84,7 +84,6 @@ def write_predictions_and_score(validation_score, model, columns_used):
     print("Writing to {}".format(filename))
     joblib.dump(model, filename)
 
-
     filename = './{}/score_and_metadata.csv'.format(key)
     print("Writing to {}".format(filename))
     score = pd.DataFrame({'estimate': [validation_score], 'columns_used': [columns_used]})
@@ -93,7 +92,7 @@ def write_predictions_and_score(validation_score, model, columns_used):
     print("Done deciding with trees")
 
 
-if __name__ == "__main__":
+def main():
     original_train, original_validate = load_data()
     train, validate = encode(original_train, original_validate)
     model = make_model(train)
@@ -105,3 +104,7 @@ if __name__ == "__main__":
     write_predictions_and_score(validation_score, model, original_train.columns)
 
     print("Decision tree analysis done with a validation score (error rate) of {}.".format(validation_score))
+
+
+if __name__ == "__main__":
+    main()
