@@ -18,24 +18,21 @@ The competition provides [4 years of purchasing history](https://www.kaggle.com/
 To make it easier to get started, we provide a data set that is a subset of the original data. The sample consists of only one type of store in one city (Quito), and only includes transaction data from the last year. This dramatically reduces the size of the data, which limits our predictive capabilities, but will be more than enough to get started with thorough analysis.
 
 ## Algorithms
-We provide one functioning machine learning model: a simple decision tree. Check out the [description for our decision tree pipeline]() for details about our implementation. 
+We provide one functioning machine learning model: a simple decision tree. Check out the [description for our decision tree pipeline](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md) for details about our implementation. 
 
 Decision trees are one of the simplest algorithms to use, which is why we've chosen it for our first approach. More complex variations of decision trees can be used to combate the downsides of decision trees, which maybe you, dear reader, would like to try out for us?
 
 At the end of the day, we chose to start with a decision tree because it is relatively light weight, it handles categorical and numerical data well, and it is robust against co-linearity, which our data has a lot of at the moment. 
 
 ## Getting Started
-This project expects python3 to be used. Some of us swear by conda, some of us can't stand conda. A lot of this is up to you.
+This project expects Python 3 to be used. Some of us swear by using Anaconda, some of us can't stand conda. A lot of these details are up to you.
 
 1. `git clone https://github.com/ThoughtWorksInc/twde-datalab && cd twde-datalab`
 1. `pip install -r requirements.txt`
-1. `python merger.py`
-1. `python splitter.py`
-1. `python decision_tree.py`
+1. `sh run_decisiontree_pipeline.sh`
 
-After the long wait for each file to compute, the output data will be uploaded to the latest folder on S3. 
+After the long wait for each file to compute, the output data will be stored in folders corresponding to the file that created them:
 - `/merger/bigTable2016-2017.csv`
-- `/merger/bigTestTable.csv`
 - `/splitter/train.csv`
 - `/splitter/test.csv`
 - `/decision_tree/submission.csv`
