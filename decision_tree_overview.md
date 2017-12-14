@@ -1,7 +1,7 @@
 Decision Tree Workflow
 -----------------
 
-Our workflow is divided into several jobs, which can be run one after another automatically; each job uses data from the latest output of the step before. The workflow looks like this: 
+Our workflow is divided into several jobs, which can be run one after another automatically when called by `sh run_decisiontree_pipeline.sh`; each job uses data from the latest output of the step before. The workflow looks like this: 
 <img src="https://user-images.githubusercontent.com/8107614/33561247-72463dd0-d912-11e7-8485-b40585da8434.png" width="500" height="500">
 
 
