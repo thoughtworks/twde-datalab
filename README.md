@@ -40,6 +40,12 @@ After the long wait for each file to compute, the output data will be stored in 
 - `/decision_tree/score_and_metadata.csv`
 - `/decision_tree/predictions.csv`
 
+If running the decision tree pipeline worked without error, you are ready to start science-ing on your own! Next, you can consider:
+- [Reading about how (and why) we implement the decision tree pipeline the way we do](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md)
+- [Doing some exploratory analysis and document what you find](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/analysis)
+- [Coming up with a hypothesis about some feature engineering tasks and test your hypothesis](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/Feature_Engineering.ipynb)
+- See also "Ways To Get Involed" below, or search our issues for more things!
+
 
 ## Ways To Get Involved
 There are many low hanging fruits ready to be picked by you, dear reader, if you want to get involved in the Data Science world at ThoughtWorks. You should look to the [issues](https://github.com/ThoughtWorksInc/twde-datalab/issues) on this repository for specifics or to ask for guidance. Categorically, some of the possible next steps include:
