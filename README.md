@@ -10,10 +10,10 @@ This is the onboarding document for the TWDE Datalab. If you want to get involve
 
 
 ## Introduction
-It's our goal to onboard you to the basics of data science as quickly and thoroughly as possible. We've selected a problem from kaggle.com that, broadly speaking, compares to a realistic problem we would tackle for clients. The specific problem is demand forecasting for an Ecuadorian grocery company. For specifics, see [the Favorita Grocery Sales Forecasting Kaggle competition](https://www.kaggle.com/c/favorita-grocery-sales-forecasting)
+It's our goal to onboard you to the basics of data science as quickly and thoroughly as possible. We've selected a challenge from kaggle.com that, broadly speaking, compares to a realistic problem we would tackle for clients. The specific problem is demand forecasting for an Ecuadorian grocery company. For details, see [the Favorita Grocery Sales Forecasting Kaggle competition](https://www.kaggle.com/c/favorita-grocery-sales-forecasting).
 
 ## Data
-The competition provides [4 years of purchasing history](https://www.kaggle.com/c/favorita-grocery-sales-forecasting/data) along with data about things like the price of oil (Ecuador is a net exporter of oil), and public holidays in Ecuador. Our goal is to analyze this data, plus any other data we acquire (see the [external data discussion on kaggle](https://www.kaggle.com/c/favorita-grocery-sales-forecasting/discussion/41537)), and produce an estimated `unit sales` for each item in each store on each day for a two week period in 2017. 
+The competition provides [4 years of purchasing history](https://www.kaggle.com/c/favorita-grocery-sales-forecasting/data) along with data about things like the price of oil (Ecuador is a net exporter of oil), and public holidays in Ecuador. Our goal is to analyze this data, plus any other data we acquire (see the [external data discussion on kaggle](https://www.kaggle.com/c/favorita-grocery-sales-forecasting/discussion/41537)), and produce an estimated `unit sales` for each item in each store for a given time period. 
 
 To make it easier to get started, we provide a data set that is a subset of the original data. The sample consists of only one type of store in one city (Quito), and only includes transaction data from the last year. This dramatically reduces the size of the data, which limits our predictive capabilities, but will be more than enough to get started with thorough analysis.
 
@@ -32,13 +32,13 @@ This project expects Python 3 to be used. Some of us swear by using Anaconda, so
 1. `sh run_decisiontree_pipeline.sh`
 
 After the long wait for each file to compute, the output data will be stored in folders corresponding to the file that created them:
-- `/merger/bigTable2016-2017.csv`
-- `/splitter/train.csv`
-- `/splitter/test.csv`
-- `/decision_tree/submission.csv`
-- `/decision_tree/model.pkl`
-- `/decision_tree/score_and_metadata.csv`
-- `/decision_tree/predictions.csv`
+- `./merger/bigTable2016-2017.csv`
+- `./splitter/train.csv`
+- `./splitter/test.csv`
+- `./decision_tree/submission.csv`
+- `./decision_tree/model.pkl`
+- `./decision_tree/score_and_metadata.csv`
+- `./decision_tree/predictions.csv`
 
 If running the decision tree pipeline worked without error, you are ready to start science-ing on your own! Next, you can consider:
 - [Reading about how (and why) we implement the decision tree pipeline the way we do](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md)
@@ -69,6 +69,8 @@ There are many low hanging fruits ready to be picked by you, dear reader, if you
 The maintainers of the repository will be happy to help you get started.
 
 We have also been exploring different ways to deploy the code on AWS. Our first approach was through creating Elastic Map Reduce clusters, but since we haven't been doing distributed computing very much, we're using AWS Data Pipeline. After you've built on the tools provided, if you'd like to try your new algorithm (or features, etc) on AWS, get in touch with us through an issue.
+
+Let's get started!
 
 ![](http://i0.kym-cdn.com/photos/images/original/001/268/288/04a.gif)
 ###### (Pictured above: the android named Data, from Star Trek - The Next Generation)
