@@ -6,7 +6,7 @@ This is the onboarding document for the TWDE Datalab. If you want to get involve
 1. [Algorithms](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#algorithms)
 1. [Getting Started](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#getting-started)
 1. [Ways To Get Involved](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#ways-to-get-involved)
-1. [Next Steps](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#next-steps)
+1. [Next Steps (Get really involved)](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#next-steps)
 
 
 ## Introduction
@@ -68,9 +68,17 @@ There are many low hanging fruits ready to be picked by you, dear reader, if you
   
 The maintainers of the repository will be happy to help you get started.
 
-We have also been exploring different ways to deploy the code on AWS. Our first approach was through creating Elastic Map Reduce clusters, but since we haven't been doing distributed computing very much, we're using AWS Data Pipeline. After you've built on the tools provided, if you'd like to try your new algorithm (or features, etc) on AWS, get in touch with us through an issue.
-
 Let's get started!
 
 ![](http://i0.kym-cdn.com/photos/images/original/001/268/288/04a.gif)
 ###### (Pictured above: the android named Data, from Star Trek - The Next Generation)
+
+
+## Next Steps (Get really involved)
+
+The default master branch represents a simplified version of our work that is optimised for comprehensibility and for local development, which is also why a dramatically downsized dataset is used.
+For really validating whether an improvement or alternative approach you applied significantly increases prediction quality you probably want to run the training on the entire dataset and you probably don't want to run it locally. 
+That is what the branch https://github.com/ThoughtWorksInc/twde-datalab/tree/run-on-aws is all about (a.k.a. the 'pro' branch).
+
+We have  been exploring different ways to deploy the code on AWS. Our first approach was through creating Elastic Map Reduce clusters, but since we haven't been doing distributed computing very much, we're using single EC2 machines being provisioned through AWS Data Pipeline. 
+If you want to get access to AWS resources or want to contribute to the pro branch get in touch with us through an issue.
