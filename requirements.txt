@@ -6,3 +6,4 @@ scikit-learn==0.19.1
 scipy==1.0.0
 tables==3.4.2
 jupyter==1.0.0
+s3fs==0.1.2
