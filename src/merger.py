@@ -82,11 +82,6 @@ def add_date_columns(df):
     return df
 
 
-def add_percentage_transactions(bigTable):
-    bigTable['percent_in_transactions'] = bigTable.unit_sales / bigTable.transactions
-    return bigTable
-
-
 def write_data(table, filename):
     if not os.path.exists('./merger'):
         os.makedirs('./merger')
@@ -119,11 +114,8 @@ if __name__ == "__main__":
     print("Adding days off")
     bigTable = add_days_off(bigTable, tables)
 
-    print("Adding item sales per store transaction")
-    bigTable = add_percentage_transactions(bigTable)
-
-    print("Calculating item-store sale variance")
-    bigTable = add_sales_variance(bigTable)
+    # print("Calculating item-store sale variance")
+    # bigTable = add_sales_variance(bigTable)
 
     print(bigTable.head())
 
