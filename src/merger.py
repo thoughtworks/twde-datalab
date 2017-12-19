@@ -8,18 +8,18 @@ def load_data():
     tables = {}
     tables_to_download = ['quito_stores_sample2016-2017', 'items', 'transactions', 'holidays_events', 'cpi']
 
-    if not os.path.exists('./raw'):
-        os.makedirs('./raw')
+    if not os.path.exists('data/raw'):
+        os.makedirs('data/raw')
 
     for t in tables_to_download:
         key = "raw/{table}.csv".format(table=t)
 
-        if not os.path.exists(key):
+        if not os.path.exists("data/" + key):
             print("Downloading data from {}".format(key))
             s3 = s3fs.S3FileSystem(anon=True)
-            s3.get(s3bucket + key, key)
+            s3.get(s3bucket + key, "data/" + key)
 
-        tables[t] = pd.read_csv(key)
+        tables[t] = pd.read_csv("data/" + key)
     return tables
 
 
@@ -83,11 +83,11 @@ def add_date_columns(df):
 
 
 def write_data(table, filename):
-    if not os.path.exists('./merger'):
-        os.makedirs('./merger')
+    if not os.path.exists('data/merger'):
+        os.makedirs('data/merger')
 
-    print("Writing to ./merger/{}".format(filename))
-    table.to_csv('merger/' + filename, index=False)
+    print("Writing to data/merger/{}".format(filename))
+    table.to_csv('data/merger/' + filename, index=False)
 
 
 def add_sales_variance(bigTable):

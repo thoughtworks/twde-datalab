@@ -1,20 +1,20 @@
+import pandas as pd
 import sys
 import os
-import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.externals import joblib
-from sklearn import tree
 sys.path.append(os.path.join('..', 'src'))
 sys.path.append(os.path.join('src'))
+from sklearn import tree
 import evaluation
 
 
 def load_data():
-    filename = "splitter/train.csv"
+    filename = "data/splitter/train.csv"
     print("Loading data from {}".format(filename))
     train = pd.read_csv(filename)
 
-    filename = 'splitter/validation.csv'
+    filename = 'data/splitter/validation.csv'
     print("Loading data from {}".format(filename))
     validate = pd.read_csv(filename)
 
@@ -81,13 +81,13 @@ def make_predictions(clf, validate):
 
 def write_predictions_and_score(validation_score, model, columns_used):
     key = "decision_tree"
-    if not os.path.exists(key):
-        os.makedirs(key)
-    filename = './{}/model.pkl'.format(key)
+    if not os.path.exists('data/{}'.format(key)):
+        os.makedirs('data/{}'.format(key))
+    filename = 'data/{}/model.pkl'.format(key)
     print("Writing to {}".format(filename))
     joblib.dump(model, filename)
 
-    filename = './{}/score_and_metadata.csv'.format(key)
+    filename = 'data/{}/score_and_metadata.csv'.format(key)
     print("Writing to {}".format(filename))
     score = pd.DataFrame({'estimate': [validation_score], 'columns_used': [columns_used]})
     score.to_csv(filename, index=False)

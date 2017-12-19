@@ -8,11 +8,11 @@ sys.path.append(os.path.join('src'))
 import evaluation
 
 def load_data():
-    filename = "splitter/train.csv"
+    filename = "data/splitter/train.csv"
     print("Loading data from {}".format(filename))
     train = pd.read_csv(filename, parse_dates=['date'])
 
-    filename = 'splitter/validation.csv'
+    filename = 'data/splitter/validation.csv'
     print("Loading data from {}".format(filename))
     validate = pd.read_csv(filename, parse_dates=['date'])
 
@@ -65,10 +65,10 @@ def get_predictions(validate, train):
 
 def write_predictions_and_score(validation_score, model, columns_used):
     key = "time_series"
-    if not os.path.exists(key):
-        os.makedirs(key)
+    if not os.path.exists("data/" + key):
+        os.makedirs("data/" + key)
 
-    filename = './{}/score_and_metadata.csv'.format(key)
+    filename = 'data/{}/score_and_metadata.csv'.format(key)
     print("Writing to {}".format(filename))
     score = pd.DataFrame({'estimate': [validation_score], 'columns_used': [columns_used]})
     score.to_csv(filename, index=False)

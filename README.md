@@ -31,12 +31,12 @@ This project expects Python 3 to be used. The easiest way to get Python 3 is by 
 1. `pip3 install -r requirements.txt`
 1. `sh run_decisiontree_pipeline.sh`
 
-After running the pipeline, which can take a while, the output data will be stored in folders corresponding to the file that created them, e.g.
-- `./merger/bigTable.csv`
-- `./splitter/train.csv`
-- `./splitter/validation.csv`
-- `./decision_tree/model.pkl`
-- `./decision_tree/score_and_metadata.csv`
+After running the pipeline, which can take a while, the output data will be stored in folders in the corresponding to the file that created them, e.g.
+- `data/merger/bigTable.csv`
+- `data/splitter/train.csv`
+- `data/splitter/validation.csv`
+- `data/decision_tree/model.pkl`
+- `data/decision_tree/score_and_metadata.csv`
 
 If running the decision tree pipeline worked without error, you are ready to start science-ing on your own! Next, you can consider:
 - [Reading about how (and why) we implement the pipeline for the decision tree the way we do](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md)

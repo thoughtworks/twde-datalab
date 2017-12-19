@@ -5,16 +5,16 @@ from sklearn.model_selection import train_test_split
 
 
 def write_data(table, filename):
-    if not os.path.exists('./splitter'):
-        os.makedirs('./splitter')
+    if not os.path.exists('data/splitter'):
+        os.makedirs('data/splitter')
 
-    print("Writing to ./splitter/{}".format(filename))
-    table.to_csv('splitter/' + filename, index=False)
+    print("Writing to data/splitter/{}".format(filename))
+    table.to_csv('data/splitter/' + filename, index=False)
 
 
 def main():
     print("Loading data from merger output")
-    train = pd.read_csv("./merger/bigTable.csv")
+    train = pd.read_csv("data/merger/bigTable.csv")
 
     train['date'] = pd.to_datetime(train['date'], format="%Y-%m-%d")
 

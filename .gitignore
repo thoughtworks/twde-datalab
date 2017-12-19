@@ -1,7 +1,4 @@
-raw/*
-merger/*
-splitter/*
-decision_tree/*
+data/**
 data/*.csv
 test/__pycache__/
 *.pyc
