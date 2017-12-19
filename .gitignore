@@ -1,5 +1,10 @@
+raw/*
+merger/*
+splitter/*
+decision_tree/*
 data/*.csv
 test/__pycache__/
 *.pyc
 **/.cache/*
 .idea
+.vscode
