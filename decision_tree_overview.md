@@ -2,15 +2,14 @@ Decision Tree Workflow
 -----------------
 
 Our workflow is divided into several jobs, which can be run one after another automatically when called by `sh run_decisiontree_pipeline.sh`; each job uses data from the latest output of the step before. The workflow looks like this: 
-<img src="https://user-images.githubusercontent.com/8107614/33561247-72463dd0-d912-11e7-8485-b40585da8434.png" width="500" height="500">
 
-
+<p><img src="https://user-images.githubusercontent.com/8107614/33561247-72463dd0-d912-11e7-8485-b40585da8434.png" width="500" height="500">
 
 
 ### Step 1: Denormalization (`src/merger.py`)
-We denormalize the data because machine learning algorithms typically prefer one input matrix. Denormalization turns n > 1 tables into 1 table. This one table is not typically how you'd like to store data in a database -- we're undoing the entire benefit gained from relational databases. 
+We denormalize the data because machine learning algorithms typically prefer one input matrix. Denormalization turns n  > 1 tables into 1 table. This one table is not how you typically store data in a database -- we're undoing the normalisation that allows relational databases to be efficient. 
 
-Suppose there is a table called sales and a table called stores, which we combine into a table which communicates the same data but less efficiently. 
+Suppose there is a table called _sales_ and a table called _stores_, which we combine into a table that contains the same data but less efficiently. 
 #### Sales:
 
 |Transaction Id| Item | Store Name |
@@ -41,7 +40,6 @@ Now we have a table that's ready be analyzed. So.
 2. joins files together based on columns they have in common
 3. adds columns to the DataFrame which are extracted out of the other columns
     - extrapolating from dates (`2015-08-10`) to  day of the week (Mon, Tues, ...)
-    - extrapolating from `date` and `city` information to get the city's population at the time, and whether it rained that day
 4. saves its output to `merger/bigTable.csv`
 
 

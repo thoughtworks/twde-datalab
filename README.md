@@ -25,30 +25,28 @@ Decision trees are one of the simplest algorithms to use, which is why we've cho
 At the end of the day, we chose to start with a decision tree because it is relatively light weight, it handles categorical and numerical data well, and it is robust against co-linearity, which our data has a lot of at the moment. 
 
 ## Getting Started
-This project expects Python 3 to be used. Some of us swear by using Anaconda, some of us can't stand conda. A lot of these details are up to you.
+This project expects Python 3 to be used. The easiest way to get Python 3 is by using [Anaconda](https://www.anaconda.com/download).
 
 1. `git clone https://github.com/ThoughtWorksInc/twde-datalab && cd twde-datalab`
-1. `pip install -r requirements.txt`
+1. `pip3 install -r requirements.txt`
 1. `sh run_decisiontree_pipeline.sh`
 
-After the long wait for each file to compute, the output data will be stored in folders corresponding to the file that created them:
-- `./merger/bigTable2016-2017.csv`
+After running the pipeline, which can take a while, the output data will be stored in folders corresponding to the file that created them, e.g.
+- `./merger/bigTable.csv`
 - `./splitter/train.csv`
-- `./splitter/test.csv`
-- `./decision_tree/submission.csv`
+- `./splitter/validation.csv`
 - `./decision_tree/model.pkl`
 - `./decision_tree/score_and_metadata.csv`
-- `./decision_tree/predictions.csv`
 
 If running the decision tree pipeline worked without error, you are ready to start science-ing on your own! Next, you can consider:
-- [Reading about how (and why) we implement the decision tree pipeline the way we do](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md)
+- [Reading about how (and why) we implement the pipeline for the decision tree the way we do](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md)
 - [Doing some exploratory analysis and document what you find](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/analysis)
 - [Coming up with a hypothesis about some feature engineering tasks and test your hypothesis](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/Feature_Engineering.ipynb)
 - See also "Ways To Get Involed" below, or search our issues for more things!
 
 
 ## Ways To Get Involved
-There are many low hanging fruits ready to be picked by you, dear reader, if you want to get involved in the Data Science world at ThoughtWorks. You should look to the [issues](https://github.com/ThoughtWorksInc/twde-datalab/issues) on this repository for specifics or to ask for guidance. Categorically, some of the possible next steps include:
+There are many low hanging fruit ready to be picked by you, dear reader, if you want to get involved in the Data Science world at ThoughtWorks. You should look to the [issues](https://github.com/ThoughtWorksInc/twde-datalab/issues) on this repository for specifics or to ask for guidance. Categorically, some of the possible next steps include:
   - Use more features for existing algorithms
     - Daily weather
     - Price of oil
