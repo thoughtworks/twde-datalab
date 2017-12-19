@@ -1,11 +1,11 @@
-import pandas as pd
 import sys
 import os
+import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.externals import joblib
+from sklearn import tree
 sys.path.append(os.path.join('..', 'src'))
 sys.path.append(os.path.join('src'))
-from sklearn import tree
 import evaluation
 
 

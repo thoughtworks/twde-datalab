@@ -1,5 +1,5 @@
-import pandas as pd
 import os
+import pandas as pd
 import s3fs
 
 def load_data():
@@ -100,19 +100,19 @@ def add_sales_variance(bigTable):
 
 
 if __name__ == "__main__":
-    tables = load_data()
+    allTables = load_data()
 
     print("Joining data to train.csv to make bigTable")
-    bigTable, trainFilename = join_tables_to_train_data(tables)
+    bigTable, trainFilename = join_tables_to_train_data(allTables)
 
     print("Adding date columns")
     bigTable = add_date_columns(bigTable)
 
     print("Joining cpi.csv to bigTable")
-    bigTable = left_outer_join(bigTable, tables['cpi'], ['year', 'month'])
+    bigTable = left_outer_join(bigTable, allTables['cpi'], ['year', 'month'])
 
     print("Adding days off")
-    bigTable = add_days_off(bigTable, tables)
+    bigTable = add_days_off(bigTable, allTables)
 
     # print("Calculating item-store sale variance")
     # bigTable = add_sales_variance(bigTable)

@@ -1,24 +1,7 @@
+import os
 import pandas as pd
 import numpy as np
-import os
 from sklearn.model_selection import train_test_split
-
-
-def move_items_from_train_to_validation(train, validation, items_to_remove):
-    train2 = train[~train.item_nbr.isin(items_to_remove)]
-    validation_to_add = train[train.item_nbr.isin(items_to_remove)]
-    validation2 = validation.append(validation_to_add)
-    return train2, validation2
-
-
-def move_random_items_from_train_to_validation(train, validation, num_items_to_remove):
-    train_items = train['item_nbr'].unique()
-    items_to_remove = np.random.choice(train_items, num_items_to_remove)
-    train2, validation2 = move_items_from_train_to_validation(train, validation, items_to_remove)
-    print("Moved {} items from train data to test data".format(num_items_to_remove))
-    print("train data: {} -> {} rows".format(train.shape[0], train2.shape[0]))
-    print("validation data: {} -> {} rows".format(validation.shape[0], validation2.shape[0]))
-    return train2, validation2
 
 
 def write_data(table, filename):
