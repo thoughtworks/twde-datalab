@@ -27,22 +27,24 @@ def fill_missing_date(df, total_dates):
     return df
 
 
-def get_predictions_for_test_good(test_good, train):
+def get_predictions(validate, train):
     total_dates = train['date'].unique()
     result = pd.DataFrame(columns=['id', 'unit_sales'])
     problem_pairs = []
-    for name, y in test_good.groupby(['item_nbr', 'store_nbr']):
-        item_nbr=name[0]
-        store_nbr = name[1]
+    example_items = [510052, 1503899, 2081175, 1047674, 215327, 1239746, 765520, 1463867, 1010755, 1473396]
+    store47examples = validate.loc[(validate.store_nbr == 47) & (validate.item_nbr.isin(example_items))]
+    print("ONLY PREDICTING ITEMS {} IN STORE NO. 47!".format(example_items))
+    for name, y in store47examples.groupby(['item_nbr']):
+    # for name, y in validate.groupby(['item_nbr', 'store_nbr']):
+        item_nbr=int(name)
+        store_nbr = 47
         df = train[(train.item_nbr==item_nbr)&(train.store_nbr==store_nbr)]
-        print("item_nbr :",item_nbr,"store_nbr :", store_nbr, "df :", df.shape, df['date'].max())
         CV_SIZE = 16 #if you make it bigger, fill missing dates in cv with 0 if any
         TRAIN_SIZE = 365
         total_dates = train['date'].unique()
         df = fill_missing_date(df, total_dates)
         df = df.sort_values(by=['date'])
         X = df[-TRAIN_SIZE:]
-        print('Train on: {}'.format(X.shape))
         X = X[['date','unit_sales']]
         X.columns = ['ds', 'y']
         m = Prophet(yearly_seasonality=True)
@@ -58,7 +60,6 @@ def get_predictions_for_test_good(test_good, train):
         data = pred[['ds','yhat']].merge(y, left_on='ds', right_on='date')
         data['unit_sales'] = data['yhat'].fillna(0).clip(0, 999999)
         result = result.append(data[['id', 'unit_sales']])
-        print("result", result.shape)
     return (result, problem_pairs)
 
 
@@ -72,8 +73,6 @@ def write_predictions_and_score(validation_score, model, columns_used):
     score = pd.DataFrame({'estimate': [validation_score], 'columns_used': [columns_used]})
     score.to_csv(filename, index=False)
 
-    print("Done deciding with trees")
-
 
 def main():
     train, validate = load_data()
@@ -82,17 +81,17 @@ def main():
     train.loc[train['unit_sales']<0, 'unit_sales']=0
     validate.loc[validate['unit_sales']<0, 'unit_sales']=0
 
-    print("train.dtypes +++++++++++++++>>>")
-    print(train.dtypes)
+    validation_predictions, problem_pairs_part = get_predictions(validate, train)
 
-    validation_predictions, problem_pairs_part = get_predictions_for_test_good(validate, train)
+    preds_sorted = validation_predictions.sort_values(by=['id'])
+    subset_for_validation = validate[validate.id.isin(validation_predictions['id'])].sort_values(by=['id'])
 
     print("Calculating estimated error")
-    validation_score = evaluation.nwrmsle(validation_predictions, validate['unit_sales'], validate['perishable'])
+    validation_score = evaluation.nwrmsle(preds_sorted['unit_sales'], subset_for_validation['unit_sales'], subset_for_validation['perishable'])
 
     write_predictions_and_score(validation_score, 0, train.columns)
 
-    print("Decision tree analysis done with a validation score (error rate) of {}.".format(validation_score))
+    print("Times series analysis done with a validation score (error rate) of {}.".format(validation_score))
 
 
 if __name__ == "__main__":
