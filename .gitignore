@@ -5,3 +5,4 @@ test/__pycache__/
 **/.cache/*
 .idea
 .vscode
+.ipynb_checkpoints
