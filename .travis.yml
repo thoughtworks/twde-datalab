@@ -7,3 +7,6 @@ install:
 
 script:
   - pytest
+
+notifications:
+  slack: tw-datalab:tySjyrBfi9MdHdiuk5hh8Jbd
