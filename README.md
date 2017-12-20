@@ -1,4 +1,6 @@
-# TWDE-Datalab
+# TWDE-Datalab 
+[![Build Status](https://travis-ci.org/ThoughtWorksInc/twde-datalab.svg?branch=master)](https://travis-ci.org/ThoughtWorksInc/twde-datalab)
+
 This is the onboarding document for the TWDE Datalab. If you want to get involved, find something confusing, or just want to say hi, [please open an issue](https://github.com/ThoughtWorksInc/twde-datalab/issues).
 
 1. [Introduction](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#introduction)
