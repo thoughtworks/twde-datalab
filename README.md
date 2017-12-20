@@ -28,7 +28,7 @@ At the end of the day, we chose to start with a decision tree because it is rela
 This project expects Python 3 to be used. The easiest way to get Python 3 is by using [Anaconda](https://www.anaconda.com/download).
 
 1. `git clone https://github.com/ThoughtWorksInc/twde-datalab && cd twde-datalab`
-1. `pip3 install -r requirements.txt`
+1. `pip install -r requirements.txt`
 1. `sh run_decisiontree_pipeline.sh`
 
 After running the pipeline, which can take a while, the output data will be stored in folders in the corresponding to the file that created them, e.g.
