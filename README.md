@@ -21,7 +21,9 @@ To make it easier to get started, we provide a data set that is a subset of the 
 
 ## Workflow
 We have structured our workflow into five steps: merging, splitting, training, predicting, and validating.
-![Workflow](master/datalab-workflow-without-kaggle.png?raw=true "..")
+
+<img src="datalab-workflow-without-kaggle.png" alt="Workflow" width="700"/>
+
 Each step has a correspondingly named .py file except training and predicting which are put together in an algorithm-specific file such as decision_tree.py. 
 
 We provide two functioning machine learning models: a simple decision tree. Check out the [description for our decision tree pipeline](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md) for details about our implementation. 
