@@ -19,8 +19,12 @@ The competition provides [4 years of purchasing history](https://www.kaggle.com/
 
 To make it easier to get started, we provide a data set that is a subset of the original data. The sample consists of only one type of store in one city (Quito), and only includes transaction data from the last year. This dramatically reduces the size of the data, which limits our predictive capabilities, but will be more than enough to get started with thorough analysis.
 
-## Algorithms
-We provide one functioning machine learning model: a simple decision tree. Check out the [description for our decision tree pipeline](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md) for details about our implementation. 
+## Workflow
+We have structured our workflow into five steps: merging, splitting, training, predicting, and validating.
+![Workflow](master/datalab-workflow-without-kaggle.png?raw=true "..")
+Each step has a correspondingly named .py file except training and predicting which are put together in an algorithm-specific file such as decision_tree.py. 
+
+We provide two functioning machine learning models: a simple decision tree. Check out the [description for our decision tree pipeline](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md) for details about our implementation. 
 
 Decision trees are one of the simplest algorithms to use, which is why we've chosen it for our first approach. More complex variations of decision trees can be used to combate the downsides of decision trees, which maybe you, dear reader, would like to try out for us?
 
