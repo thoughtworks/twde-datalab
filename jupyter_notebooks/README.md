@@ -12,7 +12,14 @@ As you approach a data problem, you should try to identify your hypotheses and y
 
 At this point, you might not know how many stores you're trying to predict sales for. Do you know how many items the stores sell? What is the date range of the data provided?
 
-Let's do some of the most [basic exploratory analysis in a Jupyter Notebook](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/analysis/Exploratory_Analysis.ipynb) 
+### Reading a Jupyter Notebook
+This directory contains a [basic exploratory analysis in a Jupyter Notebook](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/jupyter_notebooks/Exploratory_Analysis.ipynb). Github can render Jupyter notebooks and by following the link you can read the notebook.
 
+### Working with a Jupyter Notebook
+The real fun obviously lies in using the notebook. For this you have to run a Jupyter notebook server locally. If you installed Python 3 using Anaconda, then Jupyter should already be on your path.
 
+1. `cd jupyter_notebooks`
+1. `jupyter notebook`
+
+The notebook server should start up and a browser window should open on your machine, allowing you to choose a notebook from this directory. 
 
