@@ -1,3 +1,4 @@
+build/**
 data/**
 data/*.csv
 test/__pycache__/

@@ -80,6 +80,3 @@ Let's get started!
 The default master branch represents a simplified version of our work that is optimised for comprehensibility and for local development, which is also why a dramatically downsized dataset is used.
 For really validating whether an improvement or alternative approach you applied significantly increases prediction quality you probably want to run the training on the entire dataset and you probably don't want to run it locally. 
 That is what the branch https://github.com/ThoughtWorksInc/twde-datalab/tree/run-on-aws is all about (a.k.a. the 'pro' branch).
-
-We have  been exploring different ways to deploy the code on AWS. Our first approach was through creating Elastic Map Reduce clusters, but since we haven't been doing distributed computing very much, we're using single EC2 machines being provisioned through AWS Data Pipeline. 
-If you want to get access to AWS resources or want to contribute to the pro branch get in touch with us through an issue.
