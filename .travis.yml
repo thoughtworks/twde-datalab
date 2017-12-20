@@ -10,3 +10,5 @@ script:
 
 notifications:
   slack: tw-datalab:tySjyrBfi9MdHdiuk5hh8Jbd
+    on_success: change
+    on_failure: always
