@@ -16,8 +16,12 @@ if [ -z "$job" ] ; then
 fi
 
 
+cd ..
+mkdir build
+cd build
+
 echo "Creating run_pipeline_job.sh for $job"
-cp run_pipeline.sh run_pipeline_job.sh
+cp ../deployment/run_pipeline.sh run_pipeline_job.sh
 
 if [ "$job" = "all" ]; then
 	echo "python36 merger.py" >> run_pipeline_job.sh
@@ -29,11 +33,11 @@ else
   echo "python36 $job.py" >> run_pipeline_job.sh
 fi
 
-echo "Uploading run_pipeline_job.sh for $job"
+echo "Uploading run_pipeline_job.sh"
 aws s3 cp run_pipeline_job.sh s3://twde-datalab/
 
 echo "Uploading src/ to twde-datalab/src.tar.gz"
-rm ../src/*.hdf ../src/*.csv
+rm -f ../src/*.hdf -f ../src/*.csv
 tar czf src.tar.gz --directory="../src/" .
 aws s3 cp "src.tar.gz" "s3://twde-datalab/src.tar.gz"
 
