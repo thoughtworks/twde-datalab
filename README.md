@@ -26,11 +26,7 @@ We have structured our workflow into five steps: merging, splitting, training, p
 
 Each step has a correspondingly named .py file except training and predicting which are put together in an algorithm-specific file such as decision_tree.py. 
 
-We provide two functioning machine learning models: a simple decision tree. Check out the [description for our decision tree pipeline](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md) for details about our implementation. 
-
-Decision trees are one of the simplest algorithms to use, which is why we've chosen it for our first approach. More complex variations of decision trees can be used to combate the downsides of decision trees, which maybe you, dear reader, would like to try out for us?
-
-At the end of the day, we chose to start with a decision tree because it is relatively light weight, it handles categorical and numerical data well, and it is robust against co-linearity, which our data has a lot of at the moment. 
+We provide two functioning machine learning models: a simple decision tree and a time series forecasting model. Check out the [description for our decision tree pipeline](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md) for details about our implementation.  
 
 ## Getting Started
 This project expects Python 3 to be used. The easiest way to get Python 3 is by using [Anaconda](https://www.anaconda.com/download).
@@ -46,7 +42,8 @@ After running the pipeline, which can take a while, the output data will be stor
 - `data/decision_tree/model.pkl`
 - `data/decision_tree/score_and_metadata.csv`
 
-If running the decision tree pipeline worked without error, you are ready to start science-ing on your own! Next, you can consider:
+If running the decision tree pipeline worked without error, you should see a score (error rate) of ~0.83 being printed.
+The lower the score the better the prediction, so you are ready to start science-ing on your own! Next, you can consider:
 - [Reading about how (and why) we implement the pipeline for the decision tree the way we do](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md)
 - Run the tests: just run `pytest` in the projects root directory
 - [Doing some exploratory analysis and document what you find](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/jupyter_notebooks)
