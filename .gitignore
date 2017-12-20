@@ -1,4 +1,6 @@
-data/*.csv
+data/**
 test/__pycache__/
 *.pyc
 **/.cache/*
+.idea
+.vscode

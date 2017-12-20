@@ -84,30 +84,32 @@ In the short time we had to start the TWDE-Datalab, we had to gloss over a lot o
   
 The maintainers of the repository will be happy to help you get started.
 
-## Getting Started
-This project expects python3 to be used.
 
-1. `git clone https://github.com/ThoughtWorksInc/twde-datalab && cd twde-datalab`
-1. `pip3 install -r requirements.txt`
-1. `python3 merger.py`
-1. `python3 splitter.py`
-1. `python3 decision_tree.py`
+## Getting started locally
 
-After the long wait for each file to compute, the output data will be uploaded to the latest folder on S3. 
-- `/merger/<latest timestamp>/bigTable2016-2017.hdf`
-- `/merger/<latest timestamp>/bigTestTable.hdf`
-- `/splitter/<latest timestamp>/train.hdf`
-- `/splitter/<latest timestamp>/test.hdf`
-- `/decision_tree/<latest timestamp>/submission.hdf`
-- `/decision_tree/<latest timestamp>/model.pkl`
-- `/decision_tree/<latest timestamp>/score_and_metadata.csv`
-where each `<latest timestamp>` can be found in each directory's `latest` file. (i.e. `merger/latest`, `splitter/latest`, and `decision_tree/latest`)
+Please switch to the `master` branch to run the learning algorithms locally. The README on that branch has detailed instructions.
 
-We have also been exploring different ways to deploy the code on AWS. Our first approach was through creating Elastic Map Reduce clusters, but since we haven't been doing distributed computing very much, we're using AWS Data Pipeline. You can deploy a job or multiple jobs as a Data Pipeline from the `deployment` directory, using `sh deploy-pipeline -j JOB [-n PIPELINE_NAME]`. Get in touch with us if you'd like to be given access via AWS IAM.
 
-# notes for setup
-I recommend using anaconda to set up environment using environment.yml
+## Getting started on AWS
 
-Yet, sometimes necessary latest version is not available. Then please use pip in addition. 
-for example,
-pip install notebook==5.1.0
+We have also been exploring different ways to deploy the code on AWS. Our first approach was through creating Elastic Map Reduce clusters, but since we haven't been doing distributed computing very much, we're using AWS Data Pipeline. 
+
+**Before you go any further:** The software in the Git repository does not contains AWS credentials or any other way to access an AWS account. So, please make sure you have access to an AWS account
+
+If you haven't done so, install the AWS command line tools. If you are doing this now, please don't forget to configure your credentials, too.
+
+1. `pip install awscli`
+1. ` aws configure` (this will ask you for your credentials and store them in `~/.aws`)
+
+Now run a deployment script from the `deployment` directory
+
+1. `cd deployment`
+1. `./deploy-pipeline.sh -j all -n {name for the pipeline goes here}`
+
+This script will do the following:
+- create a shell script based on `run_pipeline.sh`
+- upload the shell script to S3
+- create an AWS data pipeline following `pipeline-definition.json`
+- start the pipeline
+
+At the moment the script ends here. The output (and logs) are available via the AWS console.

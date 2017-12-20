@@ -16,6 +16,7 @@ if [ -z "$job" ] ; then
 fi
 
 
+echo "Creating run_pipeline_job.sh for $job"
 cp run_pipeline.sh run_pipeline_job.sh
 
 if [ "$job" = "all" ]; then
