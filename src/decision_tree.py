@@ -6,6 +6,7 @@ from sklearn.externals import joblib
 sys.path.append(os.path.join('..', 'src'))
 sys.path.append(os.path.join('src'))
 from sklearn import tree
+from sklearn import ensemble
 import evaluation
 
 
@@ -57,6 +58,7 @@ def make_model(train):
     target = train['unit_sales']
 
     clf = tree.DecisionTreeRegressor()
+    # clf = ensemble.RandomForestRegressor() # try it out to see the difference
     clf = clf.fit(train_dropped, target)
     return clf
 

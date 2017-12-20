@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 
 
-def get_validation_period(latest_date_train, days_back):
-    # we want from wednesday to thursday (encoded as int 3) for a 15 day period
+def get_validation_period(latest_date_train, days_back=15):
+    # for Kaggle we want from Wednesday to Thursday for a 15 day period
     offset = (latest_date_train.weekday() - 3) % 7
     end_of_validation_period = latest_date_train - pd.DateOffset(days=offset)
     begin_of_validation_period = end_of_validation_period - pd.DateOffset(days=days_back)
