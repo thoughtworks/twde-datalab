@@ -42,6 +42,7 @@ After running the pipeline, which can take a while, the output data will be stor
 
 If running the decision tree pipeline worked without error, you are ready to start science-ing on your own! Next, you can consider:
 - [Reading about how (and why) we implement the pipeline for the decision tree the way we do](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md)
+- Run the tests: just run `pytest` in the projects root directory
 - [Doing some exploratory analysis and document what you find](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/jupyter_notebooks)
 - [Coming up with a hypothesis about some feature engineering tasks and test your hypothesis](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/jupyter_notebooks/Feature_Engineering.ipynb)
 - See also "Ways To Get Involed" below, or search our issues for more things!
