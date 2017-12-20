@@ -7,7 +7,7 @@ import splitter
 
 def test_get_validation_period():
     latest_date = pd.to_datetime('2017-11-22')
-    actual_begin_date, actual_end_date = load_and_split.get_validation_period(latest_date)
+    actual_begin_date, actual_end_date = splitter.get_validation_period(latest_date)
     expected_begin_date = pd.to_datetime('2017-11-01')
     expected_end_date = pd.to_datetime('2017-11-16')
     assert actual_begin_date == expected_begin_date

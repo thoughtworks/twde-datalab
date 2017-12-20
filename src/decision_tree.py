@@ -104,7 +104,7 @@ def main():
     validation_predictions = make_predictions(model, validate)
 
     print("Calculating estimated error")
-    validation_score = evaluation.nwrmsle(validation_predictions, validate['unit_sales'], validate['perishable'])
+    validation_score = evaluation.nwrmsle(validation_predictions, validate['unit_sales'].values, validate['perishable'].values)
 
     write_predictions_and_score(validation_score, model, original_train.columns)
 

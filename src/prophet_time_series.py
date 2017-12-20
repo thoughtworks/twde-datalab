@@ -87,7 +87,7 @@ def main():
     subset_for_validation = validate[validate.id.isin(validation_predictions['id'])].sort_values(by=['id'])
 
     print("Calculating estimated error")
-    validation_score = evaluation.nwrmsle(preds_sorted['unit_sales'].values, subset_for_validation['unit_sales'], subset_for_validation['perishable'])
+    validation_score = evaluation.nwrmsle(preds_sorted['unit_sales'].values, subset_for_validation['unit_sales'].values, subset_for_validation['perishable'].values)
 
     write_predictions_and_score(validation_score, 0, train.columns)
 
