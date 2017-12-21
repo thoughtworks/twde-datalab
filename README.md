@@ -70,7 +70,8 @@ There are many low hanging fruit ready to be picked by you, dear reader, if you 
     - Can data preprocessing be used for multiple algorithms?
     - Streamlining deployment on AWS
   
-The maintainers of the repository will be happy to help you get started.
+The maintainers of the repository (Emma, Jin, Arif) will be happy to help you get started. 
+You are also welcome to join the discussion in our Slack channel at https://tw-datalab.slack.com 
 
 Let's get started!
 
