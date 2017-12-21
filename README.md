@@ -36,7 +36,7 @@ This project expects Python 3 to be used. The easiest way to get Python 3 is by 
 1. `pip install -r requirements.txt`
 1. `sh run_decisiontree_pipeline.sh`
 
-After running the pipeline, which can take a while, the output data will be stored in folders in the corresponding to the file that created them, e.g.
+After running the pipeline, which can take a while the first time as it downloads the reduced raw data from our public S3 bucket (s3://twde-datalab/raw), the output data will be stored in folders in the corresponding to the file that created them, e.g.
 - `data/merger/bigTable.csv`
 - `data/splitter/train.csv`
 - `data/splitter/validation.csv`
