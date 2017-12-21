@@ -1,7 +1,7 @@
 # TWDE-Datalab 
 [![Build Status](https://travis-ci.org/ThoughtWorksInc/twde-datalab.svg?branch=master)](https://travis-ci.org/ThoughtWorksInc/twde-datalab)
 
-This is the onboarding document for the TWDE Datalab. If you want to get involved, find something confusing, or just want to say hi, [please open an issue](https://github.com/ThoughtWorksInc/twde-datalab/issues).
+This is the onboarding document for the TWDE Datalab. If you want to get involved, find something confusing, or just want to say hi, [please open an issue](https://github.com/ThoughtWorksInc/twde-datalab/issues) or join the [Slack channel](https://tw-datalab.slack.com).
 
 1. [Introduction](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#introduction)
 1. [Data](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#data)
@@ -71,7 +71,7 @@ There are many low hanging fruit ready to be picked by you, dear reader, if you 
     - Streamlining deployment on AWS
   
 The maintainers of the repository (Emma, Jin, Arif) will be happy to help you get started. 
-You are also welcome to join the discussion in our Slack channel at https://tw-datalab.slack.com (use your TW mail address to sign up)
+You are also welcome to join the discussion in our Slack channel at https://tw-datalab.slack.com (simply use your TW mail address to sign up).
 
 Let's get started!
 
