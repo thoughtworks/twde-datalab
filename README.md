@@ -71,7 +71,7 @@ There are many low hanging fruit ready to be picked by you, dear reader, if you 
     - Streamlining deployment on AWS
   
 The maintainers of the repository (Emma, Jin, Arif) will be happy to help you get started. 
-You are also welcome to join the discussion in our Slack channel at https://tw-datalab.slack.com 
+You are also welcome to join the discussion in our Slack channel at https://tw-datalab.slack.com (use your TW mail address to sign up)
 
 Let's get started!
 
