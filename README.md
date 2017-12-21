@@ -6,7 +6,8 @@ This is the onboarding document for the TWDE Datalab. If you want to get involve
 1. [Introduction](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#introduction)
 1. [Data](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#data)
 1. [Algorithms](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#algorithms)
-1. [Getting Started](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#getting-started)
+1. [Getting Started Locally](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#getting-started-locally)
+1. [Getting Started on AWS](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#getting-started-on-aws)
 1. [Ways To Get Involved](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#ways-to-get-involved)
 1. [Next Steps (Get really involved)](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#next-steps)
 
@@ -28,7 +29,7 @@ Each step has a correspondingly named .py file except training and predicting wh
 
 We provide two functioning machine learning models: a simple decision tree and a time series forecasting model. Check out the [description for our decision tree pipeline](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/decision_tree_overview.md) for details about our implementation.  
 
-## Getting Started
+## Getting Started Locally
 This project expects Python 3 to be used. The easiest way to get Python 3 is by using [Anaconda](https://www.anaconda.com/download).
 
 1. `git clone https://github.com/ThoughtWorksInc/twde-datalab && cd twde-datalab`
@@ -50,6 +51,10 @@ The lower the score the better the prediction, so you are ready to start science
 - [Coming up with a hypothesis about some feature engineering tasks and test your hypothesis](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/jupyter_notebooks/Feature_Engineering.ipynb)
 - See also "Ways To Get Involed" below, or search our issues for more things!
 
+## Getting Started on AWS
+To exploit cloud computing, you can start by [installing Anaconda on AWS EC2 instance](https://hackernoon.com/aws-ec2-part-3-installing-anaconda-on-ec2-linux-ubuntu-dbef0835818a) and [setting up Jupyter Notebooks on AWS](https://towardsdatascience.com/setting-up-and-using-jupyter-notebooks-on-aws-61a9648db6c5). 
+
+For computation using fbprophet, AMI image `tw_datalab_prophet_forecast_favorita` is available with the relevant jupyter notebook.  
 
 ## Ways To Get Involved
 There are many low hanging fruit ready to be picked by you, dear reader, if you want to get involved in the Data Science world at ThoughtWorks. You should look to the [issues](https://github.com/ThoughtWorksInc/twde-datalab/issues) on this repository for specifics or to ask for guidance. Categorically, some of the possible next steps include:
