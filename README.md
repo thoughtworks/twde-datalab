@@ -8,7 +8,7 @@ This is the onboarding document for the TWDE Datalab. If you want to get involve
 1. [Workflow](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#workflow)
 1. [Getting Started Locally](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#getting-started-locally)
 1. [Ways To Get Involved](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#ways-to-get-involved)
-1. [Next Steps: Getting started on AWS](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#next-steps)
+1. [Next Steps: Getting started on AWS](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#next-steps-getting-started-on-aws)
 
 
 ## Introduction
