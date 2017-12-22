@@ -1,4 +1,4 @@
-# TWDE-Datalab 
+# TWDE Datalab 
 [![Build Status](https://travis-ci.org/ThoughtWorksInc/twde-datalab.svg?branch=master)](https://travis-ci.org/ThoughtWorksInc/twde-datalab)
 
 This is the onboarding document for the TWDE Datalab. If you want to get involved, find something confusing, or just want to say hi, [please open an issue](https://github.com/ThoughtWorksInc/twde-datalab/issues) or join the [Slack channel](https://tw-datalab.slack.com).
@@ -7,9 +7,8 @@ This is the onboarding document for the TWDE Datalab. If you want to get involve
 1. [Data](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#data)
 1. [Algorithms](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#algorithms)
 1. [Getting Started Locally](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#getting-started-locally)
-1. [Getting Started on AWS](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#getting-started-on-aws)
 1. [Ways To Get Involved](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#ways-to-get-involved)
-1. [Next Steps (Get really involved)](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#next-steps)
+1. [Next Steps: Getting started on AWS](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/README.md#next-steps)
 
 
 ## Introduction
@@ -51,11 +50,6 @@ The lower the score the better the prediction, so you are ready to start science
 - [Coming up with a hypothesis about some feature engineering tasks and test your hypothesis](https://github.com/ThoughtWorksInc/twde-datalab/blob/master/jupyter_notebooks/Feature_Engineering.ipynb)
 - See also "Ways To Get Involed" below, or search our issues for more things!
 
-## Getting Started on AWS
-To exploit cloud computing, you can start by [installing Anaconda on AWS EC2 instance](https://hackernoon.com/aws-ec2-part-3-installing-anaconda-on-ec2-linux-ubuntu-dbef0835818a) and [setting up Jupyter Notebooks on AWS](https://towardsdatascience.com/setting-up-and-using-jupyter-notebooks-on-aws-61a9648db6c5). 
-
-For computation using fbprophet, AMI image `tw_datalab_prophet_forecast_favorita` is available with the relevant jupyter notebook.  
-
 ## Ways To Get Involved
 There are many low hanging fruit ready to be picked by you, dear reader, if you want to get involved in the Data Science world at ThoughtWorks. You should look to the [issues](https://github.com/ThoughtWorksInc/twde-datalab/issues) on this repository for specifics or to ask for guidance. Categorically, some of the possible next steps include:
   - Use more features for existing algorithms
@@ -84,8 +78,45 @@ Let's get started!
 ###### (Pictured above: the android named Data, from Star Trek - The Next Generation)
 
 
-## Next Steps (Get really involved)
+## Next Steps: Getting started on AWS
 
 The default master branch represents a simplified version of our work that is optimised for comprehensibility and for local development, which is also why a dramatically downsized dataset is used.
 For really validating whether an improvement or alternative approach you applied significantly increases prediction quality you probably want to run the training on the entire dataset and you probably don't want to run it locally. 
+
 That is what the branch https://github.com/ThoughtWorksInc/twde-datalab/tree/run-on-aws is all about (a.k.a. the 'pro' branch).
+
+**IMPORTANT:** The software in the Git repository does not contains AWS credentials or any other way to access an AWS account. 
+So, please make sure you have access to an AWS account. 
+If you want to use the AWS account of the TWDE Datalab reach out the maintainers.
+
+We have been exploring different ways to deploy the code on AWS. 
+Our first approach was through creating Elastic Map Reduce clusters, but since we settled on pandas instead of Spark at some point, we haven't been doing distributed computing very much.
+Therefore, there are two main ways we are using AWS resources: AWS Data Pipeline and Jupyter on EC2. 
+We have been using the former to run our decision tree model on larger data sets and the latter (Jupyter on EC2) to run the Prophet time series model.
+
+### Getting started using Data Pipeline
+
+If you haven't done so, install the AWS command line tools. If you are doing this now, please don't forget to configure your credentials, too.
+
+1. `pip install awscli`
+1. ` aws configure` (this will ask you for your credentials and store them in `~/.aws`)
+
+Now run a deployment script from the `deployment` directory
+
+1. `cd deployment`
+1. `./deploy-pipeline.sh -j all -n {name for the pipeline goes here}`
+
+This script will do the following:
+- create a shell script based on `run_pipeline.sh`
+- upload the shell script to S3
+- create an AWS data pipeline following `pipeline-definition.json`
+- start the pipeline
+
+At the moment the script ends here. The output (and logs) are available via the AWS console.
+
+### Getting started using Jupyter on EC2
+
+Another, maybe even simpler way to exploit cloud computing, is by [installing Anaconda on AWS EC2 instance](https://hackernoon.com/aws-ec2-part-3-installing-anaconda-on-ec2-linux-ubuntu-dbef0835818a) and [setting up Jupyter Notebooks on AWS](https://towardsdatascience.com/setting-up-and-using-jupyter-notebooks-on-aws-61a9648db6c5). 
+
+For running our Prophet time series model, we published a ready to go AMI image `tw_datalab_prophet_forecast_favorita` that already includes the relevant Jupyter notebooks. 
+When launching an EC2 instance, just search for this image in 'Community AMIs' and select it.
