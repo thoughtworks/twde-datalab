@@ -2,6 +2,7 @@ import pandas as pd
 import boto3
 import datetime
 import numpy as np
+from io import StringIO
 
 
 def get_validation_period(latest_date_train):
@@ -59,12 +60,12 @@ if __name__ == "__main__":
     print("Latest folder: {}".format(latest))
     print("Dataset value: {}".format(dataset))
 
-    s3bigTablePath = "merger/{latest}/bigTable2016-2017.hdf".format(latest=latest)
-    filename = 'bigTable2016-2017.hdf'
+    s3bigTablePath = "merger/{latest}/bigTable2016-2017.csv".format(latest=latest)
+    filename = 'bigTable2016-2017.csv'
 
     print("Downloading latest bigTable from {}".format(s3bigTablePath))
-    s3resource.Bucket(s3bucket).download_file(s3bigTablePath, filename)
-    train = pd.read_hdf(filename)
+    csv_string = s3client.get_object(Bucket=s3bucket, Key=s3bigTablePath)['Body'].read().decode('utf-8')
+    train = pd.read_csv(StringIO(csv_string))
 
     train['date'] = pd.to_datetime(train['date'], format="%Y-%m-%d")
 
@@ -81,16 +82,19 @@ if __name__ == "__main__":
         s3client.put_object(Body=timestamp, Bucket=s3bucket, Key='splitter/latest')
 
     key = "splitter/{}".format(timestamp)
-    filename = 'train.hdf'
+    filename = 'train.csv'
 
     print("Writing test to s3://{}/{}/{}".format(s3bucket, key, filename))
-    train_train.to_hdf(filename, 'key_to_store', mode='w')
-    s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
 
-    filename = 'test.hdf'
+    train_train_buffer = StringIO()
+    train_train.to_csv(train_train_buffer)
+    s3resource.Object(s3bucket, '{key}/{filename}'.format(key=key, filename=filename)).put(Body=train_train_buffer.getvalue())
+
+    filename = 'test.csv'
     print("Writing test to s3://{}/{}/{}".format(s3bucket, key, filename))
 
-    train_validation.to_hdf(filename, 'key_to_store', mode='w')
-    s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
+    train_validation_buffer = StringIO()
+    train_validation.to_csv(train_validation_buffer)
+    s3resource.Object(s3bucket, '{key}/{filename}'.format(key=key, filename=filename)).put(Body=train_validation_buffer.getvalue())
 
     print("Done")

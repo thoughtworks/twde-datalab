@@ -47,7 +47,7 @@ def join_tables_to_train_data(tables, sample):
         table = 'last_year_train'
 
     filename += '2016-2017'
-    filename += '.hdf'
+    filename += '.csv'
     bigTable = add_tables(table, tables)
     return bigTable, filename
 
@@ -85,7 +85,7 @@ def join_tables_to_test_data(tables, sample):
     else:
         table = 'test'
     bigTable = add_tables(table, tables)
-    filename = 'bigTestTable.hdf'
+    filename = 'bigTestTable.csv'
     return bigTable, filename
 
 
@@ -142,8 +142,9 @@ def write_data_to_s3(table, filename, timestamp, sample=''):
     key = "merger/{timestamp}".format(timestamp=timestamp)
     print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
 
-    table.to_hdf(filename, 'key_to_store', mode='w')
-    s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
+    csv_buffer = StringIO()
+    table.to_csv(csv_buffer)
+    s3resource.Object(s3bucket, '{key}/{filename}'.format(key=key, filename=filename)).put(Body=csv_buffer.getvalue())
 
 
 def add_sales_variance(bigTable):

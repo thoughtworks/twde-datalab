@@ -7,8 +7,9 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.externals import joblib
 sys.path.append(os.path.join('..', 'src'))
 sys.path.append(os.path.join('src'))
-from sklearn import tree
+from sklearn import ensemble
 import evaluation
+from io import StringIO
 
 
 def load_data(s3resource, s3client, s3bucket):
@@ -17,28 +18,28 @@ def load_data(s3resource, s3client, s3bucket):
     latestContents = s3client.get_object(Bucket='twde-datalab', Key='splitter/{}'.format(dataset))['Body']
     latestSplitter = latestContents.read().decode('utf-8').strip()
 
-    filename = 'train.hdf'
+    filename = 'train.csv'
     key = "splitter/{}/{}".format(latestSplitter, filename)
     print("Loading {} data from {}".format(filename, key))
-    s3resource.Bucket(s3bucket).download_file(key, filename)
-    train = pd.read_hdf(filename)
+    trainContents = s3client.get_object(Bucket=s3bucket, Key=key)['Body'].read().decode('utf-8')
+    train = pd.read_csv(StringIO(trainContents))
 
-    filename = 'test.hdf'
+    filename = 'test.csv'
     key = "splitter/{}/{}".format(latestSplitter, filename)
     print("Loading {} data from {}".format(filename, key))
-    s3resource.Bucket(s3bucket).download_file(key, filename)
-    validate = pd.read_hdf(filename)
+    validateContents = s3client.get_object(Bucket=s3bucket, Key=key)['Body'].read().decode('utf-8')
+    validate = pd.read_csv(StringIO(validateContents))
 
-    print("Loading test data from merger/testBigTable.hdf")
+    print("Loading test data from merger/testBigTable.csv")
     dataset = "latest"
     latestContents = s3client.get_object(Bucket='twde-datalab', Key='merger/{}'.format(dataset))['Body']
     latestMerger = latestContents.read().decode('utf-8').strip()
 
-    filename = 'bigTestTable.hdf'
+    filename = 'bigTestTable.csv'
     key = "merger/{}/{}".format(latestMerger, filename)
     print("Loading {} data from {}".format(filename, key))
-    s3resource.Bucket(s3bucket).download_file(key, filename)
-    test = pd.read_hdf(filename)
+    csv_string = s3client.get_object(Bucket=s3bucket, Key=key)['Body'].read().decode('utf-8')
+    test = pd.read_csv(StringIO(csv_string))
 
     return train, validate, test
 
@@ -77,7 +78,7 @@ def make_model(train):
     train_dropped = train.drop('unit_sales', axis=1)
     target = train['unit_sales']
 
-    clf = tree.DecisionTreeRegressor()
+    clf = ensemble.RandomForestRegressor()
     clf = clf.fit(train_dropped, target)
     return clf
 
@@ -113,8 +114,10 @@ def write_predictions_and_score_to_s3(s3resource, s3client, s3bucket, test_predi
     predictions = test[['id', 'unit_sales']]
     predictions.loc[predictions['unit_sales'] < 0, 'unit_sales'] = 0
     predictions['unit_sales'] = predictions['unit_sales'].round().astype(int)
-    predictions.to_csv(filename, index=False)
-    s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
+
+    preds_buffer = StringIO()
+    predictions.to_csv(preds_buffer, index=False)
+    s3resource.Object(s3bucket, '{key}/{filename}'.format(key=key, filename=filename)).put(Body=preds_buffer.getvalue())
 
     key = "decision_tree/{}".format(timestamp.isoformat())
     filename = 'model.pkl'
@@ -127,8 +130,10 @@ def write_predictions_and_score_to_s3(s3resource, s3client, s3bucket, test_predi
     print("Writing to s3://{}/{}/{}".format(s3bucket, key, filename))
     timediff = (datetime.datetime.now() - timestamp).total_seconds() / 60
     score = pd.DataFrame({'runtime_minutes': [timediff], 'estimate': [validation_score], 'columns_used': [columns_used]})
-    score.to_csv(filename, index=False)
-    s3resource.Bucket(s3bucket).upload_file(filename, '{key}/{filename}'.format(key=key, filename=filename))
+
+    score_buffer = StringIO()
+    score.to_csv(preds_buffer, index=False)
+    s3resource.Object(s3bucket, '{key}/{filename}'.format(key=key, filename=filename)).put(Body=score_buffer.getvalue())
 
     print("Done. Time elapsed (minutes): {timediff}".format(timediff=timediff))
 
