@@ -5,11 +5,11 @@ import numpy as np
 from io import StringIO
 
 
-def get_validation_period(latest_date_train):
-    # we want from wednesday to thursday (encoded as int 3) for a 15 day period
+def get_validation_period(latest_date_train, days_back=15):
+    # for Kaggle we want from Wednesday to Thursday for a 15 day period
     offset = (latest_date_train.weekday() - 3) % 7
     end_of_validation_period = latest_date_train - pd.DateOffset(days=offset)
-    begin_of_validation_period = end_of_validation_period - pd.DateOffset(days=15)
+    begin_of_validation_period = end_of_validation_period - pd.DateOffset(days=days_back)
     return (begin_of_validation_period, end_of_validation_period)
 
 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
     latest_date = train['date'].max()
 
-    begin_of_validation, end_of_validation = get_validation_period(latest_date)
+    begin_of_validation, end_of_validation = get_validation_period(latest_date, 15)
 
     print("Splitting data between {} and {}".format(begin_of_validation, end_of_validation))
     train_train, train_validation = split_validation_train_by_validation_period(train, begin_of_validation,

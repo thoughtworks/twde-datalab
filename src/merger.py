@@ -119,16 +119,6 @@ def add_tables(base_table, tables):
     return bigTable
 
 
-def add_percentage_transactions(bigTable):
-    bigTable['percent_in_transactions'] = bigTable.unit_sales / bigTable.transactions
-    return bigTable
-
-
-def add_transactions_per_capita(bigTable):
-    bigTable['transactions_per_capita'] = bigTable.transactions / bigTable.residents
-    return bigTable
-
-
 def write_data_to_s3(table, filename, timestamp, sample=''):
     s3resource = boto3.resource('s3')
     s3client = boto3.client('s3')
@@ -145,15 +135,6 @@ def write_data_to_s3(table, filename, timestamp, sample=''):
     csv_buffer = StringIO()
     table.to_csv(csv_buffer)
     s3resource.Object(s3bucket, '{key}/{filename}'.format(key=key, filename=filename)).put(Body=csv_buffer.getvalue())
-
-
-def add_sales_variance(bigTable):
-    """ Adds a new column reporting the variance
-    in unit_sales for each (item, store) tuple
-    """
-    df = bigTable.groupby(['store_nbr', 'item_nbr'])['unit_sales'].var().reset_index()
-    bigTable2 = bigTable.merge(df.rename(columns={'unit_sales': 'item_store_sales_variance'}), on=['store_nbr', 'item_nbr'])
-    return bigTable2
 
 
 if __name__ == "__main__":
@@ -186,15 +167,6 @@ if __name__ == "__main__":
     print("Adding days off")
     bigTable = add_days_off(bigTable, tables)
 
-    print("Adding item sales per store transaction")
-    bigTable = add_percentage_transactions(bigTable)
-
-    print("Adding transactions per capita")
-    bigTable = add_transactions_per_capita(bigTable)
-
-    print("Calculating item-store sale variance")
-    bigTable = add_sales_variance(bigTable)
-
     # Make test.csv have the same features as bigTable
     # TODO: Make this less spaghetti code by doing both
     # merges at the same time
@@ -209,9 +181,6 @@ if __name__ == "__main__":
 
     print("Adding days off")
     bigTestTable = add_days_off(bigTestTable, tables)
-
-    print("Adding transactions per capita")
-    bigTestTable = add_transactions_per_capita(bigTestTable)
 
     print("Adding NaNs for item-store sale variance")
     print("Adding NaNs for item sales per store transaction")
