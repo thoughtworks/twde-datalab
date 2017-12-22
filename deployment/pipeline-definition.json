@@ -24,7 +24,7 @@
                 "ref": "DefaultSchedule"
             },
             "imageId": "ami-1a962263",
-            "instanceType": "r4.16xlarge",
+            "instanceType": "r4.4xlarge",
             "name": "DefaultResource1",
             "id": "datalab-machine",
             "type": "Ec2Resource",

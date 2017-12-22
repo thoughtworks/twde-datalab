@@ -1,10 +1,17 @@
-# TWDE-Datalab (on AWS)
+# TWDE Datalab (on AWS)
 
 ## Getting started on AWS
 
-We have also been exploring different ways to deploy the code on AWS. Our first approach was through creating Elastic Map Reduce clusters, but since we haven't been doing distributed computing very much, we're using AWS Data Pipeline. 
+We have been exploring different ways to deploy the code on AWS. 
+Our first approach was through creating Elastic Map Reduce clusters, but since we settled on pandas instead of Spark at some point, we haven't been doing distributed computing very much.
+Therefore, there are two main ways we are using AWS resources: AWS Data Pipeline and Jupyter on EC2. 
+We have been using the former to run our decision tree model on larger data sets and the latter (Jupyter on EC2) to run the Prophet time series model.
 
-**Before you go any further:** The software in the Git repository does not contains AWS credentials or any other way to access an AWS account. So, please make sure you have access to an AWS account
+**IMPORTANT:** The software in the Git repository does not contains AWS credentials or any other way to access an AWS account. 
+So, please make sure you have access to an AWS account. 
+If you want to use the AWS account of the TWDE Datalab reach out the maintainers.
+
+### Data Pipeline
 
 If you haven't done so, install the AWS command line tools. If you are doing this now, please don't forget to configure your credentials, too.
 
@@ -23,3 +30,10 @@ This script will do the following:
 - start the pipeline
 
 At the moment the script ends here. The output (and logs) are available via the AWS console.
+
+### Jupyter on EC2
+
+Another, maybe even simpler way to exploit cloud computing, is by [installing Anaconda on AWS EC2 instance](https://hackernoon.com/aws-ec2-part-3-installing-anaconda-on-ec2-linux-ubuntu-dbef0835818a) and [setting up Jupyter Notebooks on AWS](https://towardsdatascience.com/setting-up-and-using-jupyter-notebooks-on-aws-61a9648db6c5). 
+
+For running our Prophet time series model, we published a ready to go AMI image `tw_datalab_prophet_forecast_favorita` that already includes the relevant Jupyter notebooks. 
+When launching an EC2 instance, just search for this image in 'Community AMIs' and select it.
