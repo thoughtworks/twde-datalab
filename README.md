@@ -31,9 +31,15 @@ This script will do the following:
 
 At the moment the script ends here. The output (and logs) are available via the AWS console.
 
-### Jupyter on EC2
+
+### Getting started using Jupyter on EC2
 
 Another, maybe even simpler way to exploit cloud computing, is by [installing Anaconda on AWS EC2 instance](https://hackernoon.com/aws-ec2-part-3-installing-anaconda-on-ec2-linux-ubuntu-dbef0835818a) and [setting up Jupyter Notebooks on AWS](https://towardsdatascience.com/setting-up-and-using-jupyter-notebooks-on-aws-61a9648db6c5). 
 
 For running our Prophet time series model, we published a ready to go AMI image `tw_datalab_prophet_forecast_favorita` that already includes the relevant Jupyter notebooks. 
-When launching an EC2 instance, just search for this image in 'Community AMIs' and select it.
+Just search for this image in 'Community AMIs' when launching an EC2 machine and make sure you open port 8888.
+Then ssh into your machine and start the Jupyter server:  
+
+1. `jupyter notebook --no-browser --port=8888`
+
+Afterwards you should be able to open Jupyter in your browser at https://ec2-{public-ip-of-ec2-machine}.{my-region}.compute.amazonaws.com:8888. When asked for a password, simply type 'datalab'.
