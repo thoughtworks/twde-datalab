@@ -112,7 +112,8 @@ This script will do the following:
 - create an AWS data pipeline following `pipeline-definition.json`
 - start the pipeline
 
-At the moment the script ends here. The output (and logs) are available via the AWS console.
+The output (and logs) are available via the AWS console.
+Unfortunately, we've run into some issues with large file sizes, which are documented here https://github.com/ThoughtWorksInc/twde-datalab/issues/25.
 
 ### Getting started using Jupyter on EC2
 
