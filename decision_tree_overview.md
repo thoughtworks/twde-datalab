@@ -9,7 +9,7 @@ Our workflow is divided into several jobs, which can be run one after another au
 ### Step 1: Denormalization (`src/merger.py`)
 We denormalize the data because machine learning algorithms typically prefer one input matrix. Denormalization turns n  > 1 tables into 1 table. This one table is not how you typically store data in a database -- we're undoing the normalisation that allows relational databases to be efficient. 
 
-Suppose there is a table called _sales_ and a table called _stores_, which we combine into a table that contains the same data but less efficiently. 
+Suppose there is a table called _sales_, a table called _items_, and a table called _stores_, which we combine into a table that contains the same data but less efficiently. 
 #### Sales:
 
 |Transaction Id| Item | Store Name |
@@ -17,6 +17,15 @@ Suppose there is a table called _sales_ and a table called _stores_, which we co
 |1|Cheese|Zimmerstrasse Store|
 |2|Cabbage|Erich-Fromm Platz Store|
 |3|Carrots|Zimmerstrasse Store|
+
+
+#### Items:
+
+|Item Name | Category |
+|-|-|
+|Cheese|Dairy|
+|Cabbage|Produce|
+|Carrots|Produce|
 
 #### Stores
 
@@ -27,11 +36,11 @@ Suppose there is a table called _sales_ and a table called _stores_, which we co
 
 #### De-normalized
 
-|Transaction Id| Item | Store Name | City |
-|-|-|-|-|
-|1|Cheese|Zimmerstrasse Store|Berlin|
-|2|Cabbage|Erich-Fromm Platz Store|Frankfurt|
-|3|Carrots|Zimmerstrasse Store|Berlin|
+|Transaction Id| Item | Store Name | City | Category |
+|-|-|-|-|-|
+|1|Cheese|Zimmerstrasse Store|Berlin|Dairy|
+|2|Cabbage|Erich-Fromm Platz Store|Frankfurt|Produce|
+|3|Carrots|Zimmerstrasse Store|Berlin|Produce|
 
 Now we have a table that's ready be analyzed. So.
 
