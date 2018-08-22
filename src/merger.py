@@ -2,24 +2,33 @@ import os
 import pandas as pd
 import s3fs
 
-def load_data():
+
+def fetch_data(tables_to_download, data_path):
     s3bucket = "twde-datalab/"
     # Load all tables from raw data
-    tables = {}
-    tables_to_download = ['quito_stores_sample2016-2017', 'items', 'transactions', 'holidays_events', 'cpi']
 
-    if not os.path.exists('data/raw'):
-        os.makedirs('data/raw')
+    if not os.path.exists(data_path + 'raw'):
+        os.makedirs(data_path + 'raw')
 
     for t in tables_to_download:
         key = "raw/{table}.csv".format(table=t)
 
-        if not os.path.exists("data/" + key):
+        if not os.path.exists(data_path + key):
             print("Downloading data from {}".format(key))
             s3 = s3fs.S3FileSystem(anon=True)
-            s3.get(s3bucket + key, "data/" + key)
+            try:
+                s3.get(s3bucket + key, data_path + key)
+            except OSError.FileNotFoundError:
+                print("Could not find {0}. Was this generated locally?".
+                      format(key))
 
-        tables[t] = pd.read_csv("data/" + key)
+
+def load_data(tables_to_load, data_path):
+    tables = {}
+    for t in tables_to_load:
+        key = "raw/{table}.csv".format(table=t)
+        print("Loading data to dataframe from {}".format(key))
+        tables[t] = pd.read_csv(data_path + key)
     return tables
 
 
@@ -28,9 +37,8 @@ def left_outer_join(left_table, right_table, on):
     return new_table
 
 
-def join_tables_to_train_data(tables):
+def join_tables_to_train_data(tables, base_table):
     filename = 'bigTable.csv'
-    base_table = 'quito_stores_sample2016-2017'
 
     print("Joining {}.csv and items.csv".format(base_table))
     bigTable = left_outer_join(tables[base_table], tables['items'], 'item_nbr')
@@ -99,11 +107,15 @@ def add_sales_variance(bigTable):
     return bigTable2
 
 
-if __name__ == "__main__":
-    allTables = load_data()
+def main(base_table='quito_stores_sample2016-2017', data_path='data/'):
+    tables = [base_table, 'items', 'transactions', 'holidays_events', 'cpi']
+
+    fetch_data(tables, data_path)
+
+    allTables = load_data(tables, data_path)
 
     print("Joining data to train.csv to make bigTable")
-    bigTable, trainFilename = join_tables_to_train_data(allTables)
+    bigTable, trainFilename = join_tables_to_train_data(allTables, base_table)
 
     print("Adding date columns")
     bigTable = add_date_columns(bigTable)
@@ -122,3 +134,7 @@ if __name__ == "__main__":
     write_data(bigTable, trainFilename)
 
     print("Finished merging")
+
+
+if __name__ == "__main__":
+    main()
