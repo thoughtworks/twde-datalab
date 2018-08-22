@@ -1,0 +1,4 @@
+['remote "local"']
+url = ./data
+[core]
+remote = local
