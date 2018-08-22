@@ -1,3 +1,5 @@
+from enum import Enum
+import numpy as np
 import pandas as pd
 import sys
 import os
@@ -8,6 +10,13 @@ sys.path.append(os.path.join('src'))
 from sklearn import tree
 from sklearn import ensemble
 import evaluation
+
+
+class Model(Enum):
+    DECISION_TREE = 0
+    RANDOM_FOREST = 1
+    ADABOOST = 2
+    GRADIENT_BOOST = 3
 
 
 def load_data():
@@ -52,13 +61,20 @@ def encode(train, validate):
     return train, validate
 
 
-def make_model(train):
+def make_model(train, model=Model.DECISION_TREE):
     print("Creating decision tree model")
     train_dropped = train.drop('unit_sales', axis=1)
     target = train['unit_sales']
 
-    clf = tree.DecisionTreeRegressor()
-    # clf = ensemble.RandomForestRegressor() # try it out to see the difference
+    if model == Model.RANDOM_FOREST:
+        clf = ensemble.RandomForestRegressor()
+    elif model == Model.ADABOOST:
+        clf = ensemble.AdaBoostRegressor()
+    elif model == Model.GRADIENT_BOOST:
+        clf = ensemble.GradientBoostingRegressor(max_depth=4, n_estimators=200)
+    else:
+        clf = tree.DecisionTreeRegressor()
+
     clf = clf.fit(train_dropped, target)
     return clf
 
@@ -97,10 +113,10 @@ def write_predictions_and_score(validation_score, model, columns_used):
     print("Done deciding with trees")
 
 
-def main():
+def main(model=Model.DECISION_TREE):
     original_train, original_validate = load_data()
     train, validate = encode(original_train, original_validate)
-    model = make_model(train)
+    model = make_model(train, model)
     validation_predictions = make_predictions(model, validate)
 
     print("Calculating estimated error")
