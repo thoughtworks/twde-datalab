@@ -1,4 +1,4 @@
 ['remote "local"']
-url = ./data
+url = /tmp/dvc/twde
 [core]
 remote = local
