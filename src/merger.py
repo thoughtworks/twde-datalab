@@ -44,7 +44,9 @@ def join_tables_to_train_data(tables, base_table):
     bigTable = left_outer_join(tables[base_table], tables['items'], 'item_nbr')
 
     print("Joining transactions.csv to bigTable")
-    bigTable = left_outer_join(bigTable, tables['transactions'], ['store_nbr', 'date'])
+    bigTable = left_outer_join(bigTable,
+                               tables['transactions'],
+                               ['store_nbr', 'date'])
 
     return bigTable, filename
 
@@ -63,21 +65,25 @@ def add_days_off(bigTable, tables):
     # TODO ignore transferred holidays
 
     # Adjusting this variable to show all holidays
-    for (d, t, l, n) in zip(holidays.date, holidays.type, holidays.locale, holidays.locale_name):
+    for (d, t, lo, n) in zip(holidays.date, holidays.type,
+                             holidays.locale, holidays.locale_name):
         if t != 'Work Day':
-            if l == 'National':
+            if lo == 'National':
                 bigTable.loc[bigTable.date == d, 'dayoff'] = True
-            elif l == 'Regional':
-                bigTable.loc[(bigTable.date == d) & (bigTable.state == n), 'dayoff'] = True
+            elif lo == 'Regional':
+                bigTable.loc[(bigTable.date == d) & (bigTable.state == n),
+                             'dayoff'] = True
             else:
-                bigTable.loc[(bigTable.date == d) & (bigTable.city == n), 'dayoff'] = True
+                bigTable.loc[(bigTable.date == d) & (bigTable.city == n),
+                             'dayoff'] = True
         else:
             bigTable.loc[(bigTable.date == d), 'dayoff'] = False
     return bigTable
 
 
 def add_date_columns(df):
-    print("Converting date columns into year, month, day, day of week, and days from last datapoint")
+    print("Converting date columns into year, month, day,"
+          " day of week, and days from last datapoint")
     df['date'] = pd.to_datetime(df['date'], format="%Y-%m-%d")
     maxdate = df.date.max()
 
@@ -102,9 +108,11 @@ def add_sales_variance(bigTable):
     """ Adds a new column reporting the variance
     in unit_sales for each (item, store) tuple
     """
-    df = bigTable.groupby(['store_nbr', 'item_nbr'])['unit_sales'].var().reset_index()
-    bigTable2 = bigTable.merge(df.rename(columns={'unit_sales': 'item_store_sales_variance'}), on=['store_nbr', 'item_nbr'])
-    return bigTable2
+    df = bigTable.groupby(['store_nbr', 'item_nbr'])['unit_sales']\
+        .var().reset_index()
+    return bigTable.merge(df.rename(columns={'unit_sales':
+                                             'item_store_sales_variance'
+                                             }), on=['store_nbr', 'item_nbr'])
 
 
 def main(base_table='quito_stores_sample2016-2017', data_path='data/'):
