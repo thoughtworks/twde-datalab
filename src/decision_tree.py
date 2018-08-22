@@ -1,3 +1,5 @@
+from enum import Enum
+import numpy as np
 import pandas as pd
 import sys
 import os
@@ -8,6 +10,13 @@ sys.path.append(os.path.join('src'))
 from sklearn import tree
 from sklearn import ensemble
 import evaluation
+
+
+class Model(Enum):
+    DECISION_TREE = 0
+    RANDOM_FOREST = 1
+    ADABOOST = 2
+    GRADIENT_BOOST = 3
 
 
 def load_data():
