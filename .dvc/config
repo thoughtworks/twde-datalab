@@ -1,0 +1,4 @@
+['remote "local"']
+url = /tmp/dvc/twde
+[core]
+remote = local
