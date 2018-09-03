@@ -1,4 +1,4 @@
-['remote "local"']
-url = /tmp/dvc/twde
 [core]
-remote = local
+remote = default
+['remote "default"']
+url = gs://continuous-intelligence
