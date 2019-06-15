@@ -1,0 +1,8 @@
+md5: 7dbfa681aa9e269883f5975956f32354
+wdir: ../..
+outs:
+- md5: d41d8cd98f00b204e9800998ecf8427e
+  path: data/raw/quito_stores_sample2016-2017.csv
+  cache: true
+  metric: false
+  persist: false

@@ -1,4 +1,4 @@
 [core]
-remote = default
-['remote "default"']
+remote = cd4ml
+['remote "cd4ml"']
 url = gs://continuous-intelligence
