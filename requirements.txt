@@ -4,7 +4,7 @@ asn1crypto==0.24.0
 astroid==2.0.4
 backcall==0.1.0
 bcrypt==3.1.4
-bleach==2.1.4
+bleach==3.1.1
 boto3==1.7.4
 botocore==1.10.82
 cachetools==2.1.0
